@@ -1,0 +1,55 @@
+.square {
+  border: 1px solid #fff;
+  width: 70px;
+  height: 70px;
+  text-align: center;
+  font-size: 46px;
+  cursor: pointer;
+  user-select: none;
+}
+.interface-board,
+.board-row {
+  display: flex;
+}
+.board {
+  margin-top: 50px;
+  color: #fff;
+  padding-bottom: 70px;
+}
+.init-game {
+  width: 355px;
+}
+.field {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.title-ip {
+  color: #fff;
+  margin-right: 25px;
+  font-size: 17px;
+}
+.title-game {
+  color: #1e90ff;
+  text-align: center;
+}
+.start-game {
+  text-align: center;
+}
+#start-game {
+  padding: 5px 10px;
+  background-color: #1e90ff;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+#start-game:hover {
+  opacity: 0.7;
+}
+.picked-location {
+  color: #ccc;
+  margin: 40px;
+}
+.winning-squares {
+  background-color: #ffebcd;
+}
