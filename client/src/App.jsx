@@ -10,15 +10,13 @@ import ProfilePage from "./pages/ProfilePage";
 import PlacesPage from "./pages/PlacesPage";
 import PlacesFormPage from "./pages/PlacesFormPage";
 import PlacePage from "./pages/PlacePage";
-import BookingsPage from "./pages/BookingsPage";  
+import BookingsPage from "./pages/BookingsPage";
 import BookingPage from "./pages/BookingPage";
-
 axios.defaults.baseURL = "http://127.0.0.1:4000";
 axios.defaults.withCredentials = true;
 
 function App() {
   return (
-    // các thành phần bên trong provider sẽ có thể truy cập vào các values mà UserContextProvider cung cấp
     <UserContextProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -32,9 +30,11 @@ function App() {
           <Route path="/place/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
+          <Route path="/account/bookings/:id" element={<BookingPage />} />
         </Route>
       </Routes>
     </UserContextProvider>
+    // các thành phần bên trong provider sẽ có thể truy cập vào các values mà UserContextProvider cung cấp
   );
 }
 

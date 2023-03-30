@@ -48,44 +48,55 @@ app.get("/testday", (req, res) => {
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    const userDoc = await User.create({
+    await User.create({
       name,
       email,
       password: bcrypt.hashSync(password, bcryptSalt),
     });
-    res.json(userDoc);
-  } catch (e) {
-    res.status(422).json(e);
+    res.json("registration successful");
+  } catch (err) {
+    res.status(422).json(`Error: ${err.message}`);
   }
 });
 
-//endpoint
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const userDoc = await User.findOne({ email });
-  if (userDoc) {
-    // so sánh password ở req.body xem có trùng vs password ở trong userDoc(là password mà ta đã hash trước đó ở register lưu vào csdl)
-    const passOK = bcrypt.compareSync(password, userDoc.password);
-    if (passOK) {
-      //chữ ký cá nhân
-      jwt.sign(
-        {
-          email: userDoc.email,
-          id: userDoc._id,
-        },
-        jwtSecret,
-        {},
-        (err, token) => {
-          if (err) throw err;
-          //đăng nhập thành công thì set cookie lưu lại dữ liệu trên cookie
-          res.cookie("token", token).json(userDoc);
-        }
-      );
+app.get("/check-email/:email", async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      res.json({ isEmailExist: true });
     } else {
-      res.status(422).json("pass not OK");
+      res.json({ isEmailExist: false });
     }
-  } else {
-    res.json("email not Ok");
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const userDoc = await User.findOne({ email });
+
+    if (!userDoc) return res.status(422).json("email not OK");
+
+    const passOK = bcrypt.compareSync(password, userDoc.password);
+    if (!passOK) return res.status(422).json("pass not OK");
+
+    const tokenOptions = {};
+    const token = jwt.sign(
+      {
+        email: userDoc.email,
+        id: userDoc._id,
+      },
+      jwtSecret,
+      tokenOptions
+    );
+
+    res.cookie("token", token).json(userDoc);
+  } catch (err) {
+    res.status(500).json(err.message);
   }
 });
 
@@ -110,15 +121,21 @@ app.post("/logout", (req, res) => {
 
 //endpoint
 app.post("/upload-by-link", async (req, res) => {
-  const { link } = req.body;
-  const newName = "/photo" + Date.now() + ".jpg";
-  const options = {
-    url: link,
-    dest: __dirname + "/uploads" + newName, // will be saved to /path/to/dest/image.jpg
-  };
+  try {
+    const { link } = req.body;
+    if (!link) {
+      res.status(422).json("You need to fill out img url!");
+      return;
+    }
+    const newName = "/photo" + Date.now() + ".jpg";
 
-  await download.image(options);
-  res.json(newName);
+    await download.image({ url: link, dest: __dirname + "/uploads" + newName });
+
+    res.json(newName);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 const photosMiddleware = multer({ dest: "uploads/" });
@@ -138,26 +155,14 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
 
 //endpoint
 app.post("/places", (req, res) => {
-  const { token } = req.cookies;
-  const {
-    title,
-    address,
-    addedPhotos,
-    description,
-    perks,
-    extraInfo,
-    checkIn,
-    checkOut,
-    maxGuests,
-    price,
-  } = req.body;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
-    const placeDoc = await Place.create({
-      owner: userData.id,
+  try {
+    const { token } = req.cookies;
+    if (!token) res.status(422).json("There are not data from UI!");
+    const {
+      name,
       title,
       address,
-      photos: addedPhotos,
+      addedPhotos,
       description,
       perks,
       extraInfo,
@@ -165,9 +170,29 @@ app.post("/places", (req, res) => {
       checkOut,
       maxGuests,
       price,
+    } = req.body;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      const placeDoc = await Place.create({
+        owner: userData.id,
+        name,
+        title,
+        address,
+        photos: addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuests,
+        price,
+      });
+      res.json(placeDoc);
     });
-    res.json(placeDoc);
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(`Error: ${error}`);
+  }
 });
 
 app.get("/user-places", (req, res) => {
@@ -185,40 +210,48 @@ app.get("/places/:id", async (req, res) => {
 });
 
 app.put("/places", async (req, res) => {
-  const { token } = req.cookies;
-  const {
-    id,
-    title,
-    address,
-    addedPhotos,
-    description,
-    perks,
-    extraInfo,
-    checkIn,
-    checkOut,
-    maxGuests,
-    price,
-  } = req.body;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
-    const placeDoc = await Place.findById(id);
-    if (userData.id === placeDoc.owner.toString()) {
-      placeDoc.set({
-        title,
-        address,
-        photos: addedPhotos,
-        description,
-        perks,
-        extraInfo,
-        checkIn,
-        checkOut,
-        maxGuests,
-        price,
-      });
-      await placeDoc.save();
-      res.json("OK");
-    }
-  });
+  try {
+    const { token } = req.cookies;
+    if (!token) res.status(422).json("There are not data from UI!");
+    const {
+      id,
+      name,
+      title,
+      address,
+      addedPhotos,
+      description,
+      perks,
+      extraInfo,
+      checkIn,
+      checkOut,
+      maxGuests,
+      price,
+    } = req.body;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      const placeDoc = await Place.findById(id);
+      if (userData.id === placeDoc.owner.toString()) {
+        placeDoc.set({
+          name,
+          title,
+          address,
+          photos: addedPhotos,
+          description,
+          perks,
+          extraInfo,
+          checkIn,
+          checkOut,
+          maxGuests,
+          price,
+        });
+        await placeDoc.save();
+        res.json("OK");
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(`Error: ${error}`);
+  }
 });
 
 //show page main
@@ -228,26 +261,27 @@ app.get("/places", async (req, res) => {
 
 //Book this place
 app.post("/bookings", async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-    req.body;
-  console.log(req.body);
-  Booking.create({
-    place,
-    user: userData.id,
-    checkIn,
-    checkOut,
-    numberOfGuests,
-    name,
-    phone,
-    price,
-  })
-    .then((doc) => {
+  try {
+    const userData = await getUserDataFromReq(req);
+    const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+      req.body;
+    if (!checkIn || !checkOut || !numberOfGuests || !name || !phone)
+      return res.status(422).json("Some fields do not enter!");
+    Booking.create({
+      place,
+      user: userData.id,
+      checkIn,
+      checkOut,
+      numberOfGuests,
+      name,
+      phone,
+      price,
+    }).then((doc) => {
       res.json(doc);
-    })
-    .catch((err) => {
-      throw err;
     });
+  } catch (err) {
+    res.status(500).send("Server error");
+  }
 });
 
 app.get("/bookings", async (req, res) => {
@@ -255,4 +289,17 @@ app.get("/bookings", async (req, res) => {
   res.json(await Booking.find({ user: userData.id }).populate("place"));
 });
 
+app.delete("/del-place/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!id) {
+      res.status(422).json("id is not exist");
+      return;
+    }
+    await Booking.deleteOne({ _id: id });
+    res.status(200).json("delete was successful");
+  } catch (err) {
+    res.status(500).json("error: " + err.message);
+  }
+});
 app.listen(4000);

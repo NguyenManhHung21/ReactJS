@@ -1,15 +1,25 @@
 import axios from "axios";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PhotosUploader({ addedPhotos, onChange }) {
   const [photoLink, setPhotoLink] = useState("");
   const addPhotoByLink = async (e) => {
     e.preventDefault();
-    const { data: filename } = await axios.post("/upload-by-link", {
-      link: photoLink,
-    });
-    onChange((prev) => [...prev, filename]);
-    setPhotoLink("");
+    try {
+      if (!photoLink) {
+        toast.warning("You need to fill out in photo URL field!");
+        return;
+      }
+      const { data: filename } = await axios.post("/upload-by-link", {
+        link: photoLink,
+      });
+      onChange((prev) => [...prev, filename]);
+      setPhotoLink("");
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
   };
 
   const uploadPhoto = (e) => {

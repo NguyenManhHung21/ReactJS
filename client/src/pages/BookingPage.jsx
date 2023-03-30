@@ -12,8 +12,6 @@ export default function BookingPage() {
     if (id) {
       axios.get("/bookings").then((res) => {
         const foundBooking = res.data.find(({ _id }) => _id === id);
-        // console.log(res.data);
-        // console.log(foundBooking);
         if (foundBooking) setBooking(foundBooking);
       });
     }

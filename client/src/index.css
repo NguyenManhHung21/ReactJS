@@ -8,7 +8,7 @@ input[type="password"],
 input[type="number"],
 input[type="tel"],
 textarea {
-  @apply w-full border my-1 px-2 py-3 rounded-2xl;
+  @apply w-full border my-1 px-2 py-3 rounded-xl;
 }
 textarea {
   height: 140px;
@@ -16,3 +16,13 @@ textarea {
 button.primary {
   @apply bg-primary p-2 w-full text-white rounded-lg mt-3;
 }
+/* .max-w-6xl
+{
+  max-width: unset !important;
+  width: 80% !important;
+}
+.max-w-6xl img
+{
+  width: 100%;
+  object-fit: cover;
+}  */

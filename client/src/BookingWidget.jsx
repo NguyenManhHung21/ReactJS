@@ -3,6 +3,8 @@ import { differenceInCalendarDays } from "date-fns";
 import axios from "axios";
 import { UserContext } from "./UserContext";
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function BookingWidget({ place }) {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -26,17 +28,26 @@ export default function BookingWidget({ place }) {
     );
   }
   const bookThisPlace = async () => {
-    const response = await axios.post("/bookings", {
-      place: place._id,
-      checkIn,
-      checkOut,
-      numberOfGuests,
-      name,
-      phone,
-      price: numberOfNights * place.price,
-    });
-    const bookingId = response.data._id;
-    setRedirect(`/account/bookings/${bookingId}`);
+    try {
+      if (place.owner === user._id) {
+        toast.error("You can not book this place. Cause you are the owner!");
+        return;
+      }
+      const response = await axios.post("/bookings", {
+        place: place._id,
+        checkIn,
+        checkOut,
+        numberOfGuests,
+        name,
+        phone,
+        price: numberOfNights * place.price,
+      });
+      const bookingId = response.data._id;
+      setRedirect(`/account/bookings/${bookingId}`);
+      toast.success("The reservation was successful!");
+    } catch (err) {
+      toast.error("You need to enter all of fields!");
+    }
   };
 
   if (redirect) return <Navigate to={redirect} />;

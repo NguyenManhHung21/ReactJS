@@ -1,9 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import AccountNav from "../AccountNav";
 import Perks from "../Perks";
 import PhotosUploader from "../PhotosUploader";
+import { UserContext } from "../UserContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PlacesFormPage() {
   const { id } = useParams();
@@ -18,7 +21,7 @@ export default function PlacesFormPage() {
   const [maxGuests, setMaxGuests] = useState(1);
   const [price, setPrice] = useState(100);
   const [redirect, setRedirect] = useState(false);
-
+  const { user } = useContext(UserContext);
   useEffect(() => {
     if (!id) {
       return;
@@ -56,30 +59,50 @@ export default function PlacesFormPage() {
   };
 
   const savePlace = async (e) => {
-    const placeData = {
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkOut,
-      maxGuests,
-      price,
-    };
     e.preventDefault();
-    if (id) {
-      //update
-      await axios.put("/places", {
-        id,
-        ...placeData,
-      });
-    } else {
-      //new place
-      await axios.post("/places", placeData);
+    if (
+      !title ||
+      !address ||
+      addedPhotos.length === 0 ||
+      perks.length === 0 ||
+      !description ||
+      !extraInfo ||
+      !checkIn ||
+      !checkOut
+    ) {
+      toast.warning("You need to fill out all of fields");
+      return;
     }
-    setRedirect(true);
+
+    try {
+      const placeData = {
+        name: user.name,
+        title,
+        address,
+        addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuests,
+        price,
+      };
+      if (id) {
+        //update
+        await axios.put("/places", {
+          id,
+          ...placeData,
+        });
+      } else {
+        //new place
+        await axios.post("/places", placeData);
+      }
+      setRedirect(true);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save place");
+    }
   };
   if (redirect) return <Navigate to={"/account/places"} />;
   return (

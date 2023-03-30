@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -8,22 +10,29 @@ export default function RegisterPage() {
 
   const registerUser = async (e) => {
     e.preventDefault();
+    const userData = { name, email, password };
     try {
-      await axios.post("/register", {
-        name,
-        email,
-        password,
-      });
-      alert("Registration successful. Now you can log in!");
+      const checkEmailExits = await axios
+        .get(`/check-email/${email}`)
+        .then((res) => res.data);
+      if (checkEmailExits.isEmailExist) {
+        toast.error(
+          "This email is already existed. Please try with another email!"
+        );
+        return;
+      }
+      await axios.post("/register", userData);
+      setName("");
+      setEmail("");
+      setPassword("");
+      toast.success("Registration successful. Now you can log in!");
     } catch (e) {
-      alert(
-        "Registration failed cause this email is already existed. Please try again later!."
-      );
+      toast.error("Registration failed. Please try again later!.");
     }
   };
   return (
-    <div className="mt-4 grow flex items-center justify-around ">
-      <div className="mb-56">
+    <div className="grow flex items-center justify-around ">
+      <div className="mb-32 border shadow-xl p-12">
         <h1 className="text-4xl text-center mb-4">Register</h1>
         <form className="max-w-md mx-auto" onSubmit={registerUser}>
           <input
@@ -55,7 +64,7 @@ export default function RegisterPage() {
           />
           <button className="primary">Register</button>
           <div className="text-center py-2 text-gray-500">
-            Already a member?
+            Already a member?&nbsp;
             <Link className="text-black underline " to={"/login"}>
               Login
             </Link>

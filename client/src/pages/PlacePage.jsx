@@ -12,7 +12,9 @@ export default function PlacePage() {
     if (!id) {
       return;
     }
-    axios.get(`/places/${id}`).then((res) => setPlace(res.data));
+    axios.get(`/places/${id}`).then((res) => {
+      setPlace(res.data);
+    });
   }, [id]);
 
   return (
@@ -27,11 +29,11 @@ export default function PlacePage() {
             <h2 className="font-semibold text-2xl">Description</h2>
             {place.description}
           </div>
-          Check-in: {place.checkIn}
+          Check-in: {place.checkIn}h
           <br />
-          Check-out: {place.checkOut}
+          Check-out: {place.checkOut}h
           <br />
-          Max number of guests: {place.maxGuests}
+          Max number of guests: {place.maxGuests} people
         </div>
         <div>
           <BookingWidget place={place} />

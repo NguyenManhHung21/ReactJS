@@ -25,11 +25,15 @@ export default function PlaceGallery({ place }) {
             </svg>
             Close photos
           </button>
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-5">
             {place?.photos?.length > 0 &&
-              place.photos.map((photo) => (
-                <div className="max-w-6xl">
-                  <img src={`http://localhost:4000/uploads/${photo}`} alt="" />
+              place.photos.map((photo, index) => (
+                <div key={index} className="w-2/3">
+                  <img
+                    className="w-full"
+                    src={`http://localhost:4000/uploads/${photo}`}
+                    alt=""
+                  />
                 </div>
               ))}
           </div>

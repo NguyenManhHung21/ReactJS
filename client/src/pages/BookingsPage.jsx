@@ -4,13 +4,27 @@ import AccountNav from "../AccountNav";
 import PlaceImg from "../PlaceImg";
 import { Link } from "react-router-dom";
 import BookingDates from "../BookingDates";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Button, Modal } from "flowbite-react";
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
+  const [showDel, setShowDel] = useState(false);
   useEffect(() => {
     axios.get("/bookings").then((res) => {
       setBookings(res.data);
     });
   }, []);
+  const handleCancelPlace = (id) => {
+    axios
+      .delete(`/del-place/${id}`)
+      .then((res) => {
+        const updateBookings = bookings.filter((place) => place._id !== id);
+        setBookings(updateBookings);
+        toast.success("You have successfully canceled your reservation!");
+      })
+      .catch((err) => `Error: ${err}`);
+  };
   return (
     <div>
       <AccountNav />
@@ -22,14 +36,16 @@ export default function BookingsPage() {
               className="flex gap-4 bg-gray-200 rounded-2xl overflow-hidden my-4"
               key={booking._id}
             >
-              <div className="w-48">
+              <div className="flex w-32 grow-0 shrink-0">
                 <PlaceImg place={booking.place} />
               </div>
               <div className="py-3 pr-3 grow">
                 <h2 className="text-xl">{booking.place.title}</h2>
-
                 <div className="text-xl">
-                  <BookingDates className="my-2 text-gray-500" booking={booking} />
+                  <BookingDates
+                    className="my-2 text-gray-500"
+                    booking={booking}
+                  />
                   <div className=" flex items-center gap-1 ">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -51,6 +67,69 @@ export default function BookingsPage() {
                   </div>
                 </div>
               </div>
+              <Button
+                color="failure"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowDel(true);
+                }}
+                className="flex items-center bg-red-500 px-2 text-white hover:opacity-80"
+              >
+                Cancel
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </Button>
+              <Modal
+                show={showDel}
+                size="md"
+                popup={true}
+                onClose={(e) => {
+                  e.preventDefault();
+                  setShowDel(false);
+                }}
+              >
+                <Modal.Header />
+                <Modal.Body>
+                  <div className="text-center">
+                    <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                      Are you sure you want to delete this place?
+                    </h3>
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        color="failure"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCancelPlace(booking._id);
+                          setShowDel(false);
+                        }}
+                      >
+                        Yes, I'm sure
+                      </Button>
+                      <Button
+                        color="gray"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowDel(false);
+                        }}
+                      >
+                        No, cancel
+                      </Button>
+                    </div>
+                  </div>
+                </Modal.Body>
+              </Modal>
             </Link>
           ))}
       </div>

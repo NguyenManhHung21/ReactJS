@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const placeSchema = new Schema({
   owner: { type: mongoose.Schema.Types.ObjectId },
+  name: String,
   title: String,
   address: String,
   photos: [String],
