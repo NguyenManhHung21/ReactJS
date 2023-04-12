@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const User = require("./models/User.js");
-const Place = require("./models/Place.js");
-const Booking = require("./models/Booking.js");
+const User = require("./src/app/models/User.js");
+const Place = require("./src/app/models/Place.js");
+const Booking = require("./src/app/models/Booking.js");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
 const bcrypt = require("bcryptjs");
@@ -14,6 +14,8 @@ const jwt = require("jsonwebtoken");
 const jwtSecret = "usadWdu32iUIAs4ad2";
 const multer = require("multer");
 const fs = require("fs");
+
+const route = require('./src/routes')
 
 //IRVtd7spPJzJSwig
 app.use(express.json());
@@ -28,17 +30,20 @@ app.use(
 mongoose.connect(process.env.MONGO_URL);
 
 //lấy ra 1 user
-const getUserDataFromReq = (req) => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(userData);
-      }
-    });
-  });
-};
+// const getUserDataFromReq = (req) => {
+//   return new Promise((resolve, reject) => {
+//     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+//       if (err) {
+//         reject(err);
+//       } else {
+//         resolve(userData);
+//       }
+//     });
+//   });
+// };
+
+//Routes init
+route(app);
 
 app.get("/testday", (req, res) => {
   res.json("test ok nha");
@@ -75,7 +80,7 @@ app.get("/check-email/:email", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body; 
 
     const userDoc = await User.findOne({ email });
 
@@ -153,47 +158,7 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
   res.json(uploadFiles);
 });
 
-//endpoint
-app.post("/places", (req, res) => {
-  try {
-    const { token } = req.cookies;
-    if (!token) res.status(422).json("There are not data from UI!");
-    const {
-      name,
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkOut,
-      maxGuests,
-      price,
-    } = req.body;
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const placeDoc = await Place.create({
-        owner: userData.id,
-        name,
-        title,
-        address,
-        photos: addedPhotos,
-        description,
-        perks,
-        extraInfo,
-        checkIn,
-        checkOut,
-        maxGuests,
-        price,
-      });
-      res.json(placeDoc);
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json(`Error: ${error}`);
-  }
-});
+
 
 app.get("/user-places", (req, res) => {
   const { token } = req.cookies;
@@ -204,90 +169,132 @@ app.get("/user-places", (req, res) => {
   });
 });
 
-app.get("/places/:id", async (req, res) => {
-  const { id } = req.params;
-  res.json(await Place.findById(id));
-});
 
-app.put("/places", async (req, res) => {
-  try {
-    const { token } = req.cookies;
-    if (!token) res.status(422).json("There are not data from UI!");
-    const {
-      id,
-      name,
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkOut,
-      maxGuests,
-      price,
-    } = req.body;
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const placeDoc = await Place.findById(id);
-      if (userData.id === placeDoc.owner.toString()) {
-        placeDoc.set({
-          name,
-          title,
-          address,
-          photos: addedPhotos,
-          description,
-          perks,
-          extraInfo,
-          checkIn,
-          checkOut,
-          maxGuests,
-          price,
-        });
-        await placeDoc.save();
-        res.json("OK");
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json(`Error: ${error}`);
-  }
-});
+//endpoint
+// app.post("/places", (req, res) => {
+//   try {
+//     const { token } = req.cookies;
+//     if (!token) res.status(422).json("There are not data from UI!");
+//     const {
+//       name,
+//       title,
+//       address,
+//       addedPhotos,
+//       description,
+//       perks,
+//       extraInfo,
+//       checkIn,
+//       checkOut,
+//       maxGuests,
+//       price,
+//     } = req.body;
+//     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+//       if (err) throw err;
+//       const placeDoc = await Place.create({
+//         owner: userData.id,
+//         name,
+//         title,
+//         address,
+//         photos: addedPhotos,
+//         description,
+//         perks,
+//         extraInfo,
+//         checkIn,
+//         checkOut,
+//         maxGuests,
+//         price,
+//       });
+//       res.json(placeDoc);
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json(`Error: ${error}`);
+//   }
+// });
+
+// app.put("/places", async (req, res) => {
+//   try {
+//     const { token } = req.cookies;
+//     if (!token) res.status(422).json("There are not data from UI!");
+//     const {
+//       id,
+//       name,
+//       title,
+//       address,
+//       addedPhotos,
+//       description,
+//       perks,
+//       extraInfo,
+//       checkIn,
+//       checkOut,
+//       maxGuests,
+//       price,
+//     } = req.body;
+//     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+//       if (err) throw err;
+//       const placeDoc = await Place.findById(id);
+//       if (userData.id === placeDoc.owner.toString()) {
+//         placeDoc.set({
+//           name,
+//           title,
+//           address,
+//           photos: addedPhotos,
+//           description,
+//           perks,
+//           extraInfo,
+//           checkIn,
+//           checkOut,
+//           maxGuests,
+//           price,
+//         });
+//         await placeDoc.save();
+//         res.json("OK");
+//       }
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json(`Error: ${error}`);
+//   }
+// });
 
 //show page main
-app.get("/places", async (req, res) => {
-  res.json(await Place.find());
-});
+// app.get("/places", async (req, res) => {
+//   res.json(await Place.find());
+// });
 
 //Book this place
-app.post("/bookings", async (req, res) => {
-  try {
-    const userData = await getUserDataFromReq(req);
-    const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-      req.body;
-    if (!checkIn || !checkOut || !numberOfGuests || !name || !phone)
-      return res.status(422).json("Some fields do not enter!");
-    Booking.create({
-      place,
-      user: userData.id,
-      checkIn,
-      checkOut,
-      numberOfGuests,
-      name,
-      phone,
-      price,
-    }).then((doc) => {
-      res.json(doc);
-    });
-  } catch (err) {
-    res.status(500).send("Server error");
-  }
-});
+// app.post("/bookings", async (req, res) => {
+//   try {
+//     const userData = await getUserDataFromReq(req);
+//     const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+//       req.body;
+//     if (!checkIn || !checkOut || !numberOfGuests || !name || !phone)
+//       return res.status(422).json("Some fields do not enter!");
+//     Booking.create({
+//       place,
+//       user: userData.id,
+//       checkIn,
+//       checkOut,
+//       numberOfGuests,
+//       name,
+//       phone,
+//       price,
+//     }).then((doc) => {
+//       res.json(doc);
+//     });
+//   } catch (err) {
+//     res.status(500).send("Server error");
+//   }
+// });
 
-app.get("/bookings", async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  res.json(await Booking.find({ user: userData.id }).populate("place"));
-});
+// app.get("/bookings", async (req, res) => {
+//   try {
+//     const userData = await getUserDataFromReq(req);
+//     res.json(await Booking.find({ user: userData.id }).populate("place"));
+//   } catch (error) {
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
 app.delete("/del-place/:id", async (req, res) => {
   const { id } = req.params;

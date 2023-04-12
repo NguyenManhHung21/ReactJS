@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const placeSchema = new Schema({
+const Place = new Schema({
   owner: { type: mongoose.Schema.Types.ObjectId },
   name: String,
   title: String,
@@ -16,6 +16,6 @@ const placeSchema = new Schema({
   price: Number,
 });
 
-const PlaceModel = mongoose.model("Place", placeSchema);
+const PlaceModel = mongoose.model("Place", Place);
 
 module.exports = PlaceModel;
