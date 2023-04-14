@@ -2,7 +2,8 @@ const Place = require("../models/Place");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "usadWdu32iUIAs4ad2";
 class PlacesController {
-  //[GET] /places
+  
+  //show page main
   async getPlaces(req, res) {
     res.json(await Place.find());
   }
@@ -100,6 +101,7 @@ class PlacesController {
         res.status(500).json(`Error: ${error}`);
       }
     }
+    
 }
 
 module.exports = new PlacesController();

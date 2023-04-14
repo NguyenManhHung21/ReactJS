@@ -3,6 +3,7 @@ const Booking = require("../models/Booking");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "usadWdu32iUIAs4ad2";
 
+//lấy ra 1 user
 const getUserDataFromReq = (req) => {
   return new Promise((resolve, reject) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
