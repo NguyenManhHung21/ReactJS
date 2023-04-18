@@ -5,43 +5,39 @@ import { getIdInput } from "../redux/actions";
 import { todoEditSelector } from "../redux/selector";
 import { UserContext } from "../StudentContext";
 import StudentList from "./StudentList";
+import axios from "axios";
 
 export default memo(function InputBoard() {
   const [idStd, setIdStd] = useState("");
   const [nameStd, setNameStd] = useState("");
   const [birthday, setBirthday] = useState("");
   const [genderChecked, setGenderChecked] = useState("");
-  const [faculty, setFaculty] = useState("");
+  const [idFaculty, setIdFaculty] = useState("");
   const [listStudents, setListStudents] = useState([]);
-  const id = useRef();
+  const [listFaculties, setListFaculties] = useState([]);
   const handleUpdate = () => {
-    id.current.disabled = false;
-    const studentsStorage = localStorage.getItem("students")
-      ? JSON.parse(localStorage.getItem("students"))
-      : [];
-    studentsStorage.forEach((student, index) => {
-      if (student.idStd === idStd) {
-        studentsStorage[index] = {
-          idStd,
-          nameStd,
-          birthday,
-          genderChecked,
-          faculty,
-        };
-      }
-    });
-
-    localStorage.setItem("students", JSON.stringify(studentsStorage));
-    setListStudents(studentsStorage);
+    try {
+      axios.put(`/update-${idStd}`, {
+        idStd,
+        nameStd,
+        birthday,
+        gender: genderChecked,
+        idFaculty,
+      });
+      loadData();
+    } catch (error) {
+      console.log("Error: " + error);
+    }
   };
-  //redux
+
+  //REDUX
   // const todoEdit = useSelector(todoEditSelector);
   // useEffect(() => {
   //   setIdStd(todoEdit.id);
   //   setNameStd(todoEdit.name);
   //   setBirthday(todoEdit.birthday);
   //   setGenderChecked(todoEdit.gender);
-  //   setFaculty(todoEdit.faculty);
+  //   setIdFaculty(todoEdit.idFaculty);
   // }, [todoEdit]);
 
   //useContext
@@ -50,54 +46,53 @@ export default memo(function InputBoard() {
     setIdStd(student.idStd);
     setNameStd(student.nameStd);
     setBirthday(student.birthday);
-    setGenderChecked(student.genderChecked);
-    setFaculty(student.faculty);
+    setGenderChecked(student.gender);
+    setIdFaculty(student.idFaculty);
   }, [student]);
 
-  const handleAddStudent = () => {
+  useEffect(() => {
+    try {
+      axios
+        .get("https://localhost:7168/api/Faculties")
+        .then((res) => setListFaculties(res.data));
+      axios.get("/listStd").then((res) => setListStudents(res.data));
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  }, []);
+
+  const loadData = () => {
+    axios.get("/listStd").then((res) => setListStudents(res.data));
+  };
+
+  const handleAddStudent = async () => {
     if (
-      idStd === "" ||
-      nameStd === "" ||
-      birthday === "" ||
-      genderChecked === "" ||
-      faculty === ""
+      nameStd === undefined ||
+      birthday === undefined ||
+      genderChecked === undefined ||
+      idFaculty === undefined
     ) {
       alert("Yêu cầu nhập đầy đủ các trường!!");
-      return true;
-    }
-    const studentsStorage = localStorage.getItem("students")
-      ? JSON.parse(localStorage.getItem("students"))
-      : [];
-    if (studentsStorage.some((student) => student.idStd === idStd)) {
-      alert(`ID: ${idStd} đã tồn tại. Yêu cầu nhập ID khác!!`);
-      id.current.className =
-        "text-red-600 border border-red-600 bg-gray-50 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full py-add px-2";
       return;
-    } else {
-      id.current.className =
-        "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full py-add px-2";
-      id.current.focus();
+    }
+    try {
+      await axios.post("/addDefault", {
+        nameStd,
+        birthday,
+        gender: genderChecked,
+        idFaculty,
+      });
+      loadData();
+    } catch (error) {
+      console.log("Error: " + error);
     }
 
-    const newStudent = {
-      idStd,
-      nameStd,
-      birthday,
-      genderChecked,
-      faculty,
-    };
-    setListStudents([...studentsStorage, newStudent]);
-
-    localStorage.setItem(
-      "students",
-      JSON.stringify([...studentsStorage, newStudent])
-    );
-    setIdStd("");
     setNameStd("");
     setBirthday("");
     setGenderChecked("");
-    setFaculty("");
+    setIdFaculty("");
   };
+
   return (
     <div>
       <div className="flex flex-col items-center">
@@ -119,9 +114,6 @@ export default memo(function InputBoard() {
           <thead>
             <tr>
               <th className="py-3 border-r">
-                Mã SV<span className="text-red-600">*</span>
-              </th>
-              <th className="py-3 border-r">
                 Tên SV<span className="text-red-600">*</span>{" "}
               </th>
               <th className="py-3 border-r">Ngày sinh</th>
@@ -133,19 +125,6 @@ export default memo(function InputBoard() {
           </thead>
           <tbody>
             <tr>
-              <td className="px-6">
-                <input
-                  ref={id}
-                  // disabled={todoEdit.id}
-                  disabled={student.idStd}
-                  value={idStd || ""}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full py-add px-2"
-                  type="text"
-                  name=""
-                  id=""
-                  onChange={(e) => setIdStd(e.target.value)}
-                />
-              </td>
               <td className="px-6">
                 <input
                   value={nameStd || ""}
@@ -169,8 +148,8 @@ export default memo(function InputBoard() {
                 <input
                   type="radio"
                   name=""
-                  checked={genderChecked === "Nữ"}
-                  value="Nữ"
+                  checked={genderChecked === "Nam"}
+                  value="Nam"
                   onChange={(e) => setGenderChecked(e.target.value)}
                   id="male"
                 />{" "}
@@ -180,40 +159,29 @@ export default memo(function InputBoard() {
                 <input
                   type="radio"
                   name=""
-                  checked={genderChecked === "Nam"}
-                  value="Nam"
+                  checked={genderChecked === "Nu"}
+                  value="Nu"
                   onChange={(e) => setGenderChecked(e.target.value)}
                   id="female"
                 />{" "}
                 <label className="mr-3" htmlFor="female">
                   Nữ
                 </label>
-                <input
-                  type="radio"
-                  name=""
-                  checked={genderChecked === "Giới tính khác"}
-                  value="Giới tính khác"
-                  onChange={(e) => setGenderChecked(e.target.value)}
-                  id="others"
-                />{" "}
-                <label className="mr-3" htmlFor="others">
-                  Khác
-                </label>
               </td>
               <td className="px-6">
                 <select
-                  value={faculty || ""}
+                  value={idFaculty}
                   name=""
-                  id="faculty"
+                  id="idFaculty"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full py-add px-3"
-                  onChange={(e) => setFaculty(e.target.value)}
+                  onChange={(e) => setIdFaculty(e.target.value)}
                 >
                   <option value="">-- Khoa --</option>
-                  <option value="CNTT">CNTT</option>
-                  <option value="QTKD">QTKD</option>
-                  <option value="KHMT">KHMT</option>
-                  <option value="TĐH">TĐH</option>
-                  <option value="HTTT">HTTT</option>
+                  {listFaculties.map((faculty) => (
+                    <option key={faculty.idFaculty} value={faculty.idFaculty}>
+                      {faculty.nameFaculty}
+                    </option>
+                  ))}
                 </select>
               </td>
             </tr>

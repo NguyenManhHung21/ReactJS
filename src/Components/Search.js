@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useContext, useEffect, useState } from "react";
+// import { useDispatch, useSelector } from "react-redux";
 import StudentList from "./StudentList";
+import axios from "axios";
+import { UserContext } from "../StudentContext";
+import { Link } from "react-router-dom";
 
 export default function Search() {
   const [search, setSearch] = useState("");
+  const [listStudents, setListStudents] = useState([]);
+  const { setStudent } = useContext(UserContext);
+
   const [stdSearch, setStdSearch] = useState({});
   const [show, setShow] = useState(false);
   // const dispatch = useDispatch() //có tac dụng để đẩy dữ liệU lên store
@@ -12,21 +18,50 @@ export default function Search() {
   // const handleTest = () => {
   //   // console.log();
   // };
+
   useEffect(() => {
-    console.log("re-render callback");
-    const studentsStorage = localStorage.getItem("students")
-      ? JSON.parse(localStorage.getItem("students"))
-      : [];
+    try {
+      axios.get("/listStd").then((res) => setListStudents(res.data));
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  }, []);
+  // useEffect(() => {
+  //   let show = false;
+  //   listStudents.forEach((student) => {
+  //     if (student.idStd === search) {
+  //       setStdSearch(student);
+  //       show = true;
+  //       console.log("tim thay");
+  //     }
+  //   });
+  //   setShow(show);
+  // }, [search]);
+  const handleEdit = (student) => {
+    setStudent(student);
+  };
+  const handleDelete = (id) => {
+    const confirm = window.confirm("Are you sure you want to delete");
+    try {
+      if (confirm)
+        axios
+          .delete(`/delStudent-${id}`)
+          .then((res) => setListStudents(res.data));
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  };
+  const handleSearch = () => {
     let show = false;
-    studentsStorage.forEach((student) => {
-      if (student.idStd === search) {
+    listStudents.forEach((student) => {
+      if (student.idStd == search) {
         setStdSearch(student);
         show = true;
         console.log("tim thay");
       }
     });
     setShow(show);
-  }, [search]);
+  };
   return (
     <div>
       <div className="max-w-2xl">
@@ -56,6 +91,13 @@ export default function Search() {
             placeholder="Nhập ID Sinh Viên cần tìm..."
             required
           />
+          <button
+            onClick={handleSearch}
+            type="button"
+            class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+          >
+            Search
+          </button>
         </div>
         {/* <button className="border bg-red-300" onClick={handleTest}>
           Test
@@ -81,6 +123,9 @@ export default function Search() {
                 <th scope="col" className="px-6 py-3">
                   Khoa
                 </th>
+                <th scope="col" className="px-6 py-3">
+                  Hành động
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -92,6 +137,22 @@ export default function Search() {
                 <td className="px-6 py-4">{stdSearch.birthday}</td>
                 <td className="px-6 py-4">{stdSearch.genderChecked}</td>
                 <td className="px-6 py-4">{stdSearch.faculty}</td>
+                <td className="px-6 py-4">
+                  <button
+                    onClick={() => handleEdit(stdSearch)}
+                    className="mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+                  >
+                    <Link to={"/addstudent"}>Sửa</Link>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDelete(stdSearch.idStd);
+                    }}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+                  >
+                    Xoá
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>

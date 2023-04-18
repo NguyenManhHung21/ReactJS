@@ -5,6 +5,8 @@ import StudentList from "./Components/StudentList";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 import { StudentContext } from "./StudentContext";
+import axios from "axios";
+axios.defaults.baseURL = "https://localhost:7168/api/Students";
 function App() {
   return (
     <StudentContext>

@@ -1,26 +1,24 @@
 import { memo, useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserContext } from "../StudentContext";
-import { todoEdit } from "../redux/actions";
+import axios from "axios";
+import moment from "moment";
+import { Button, Modal } from "flowbite-react";
+
 export default memo(function StudentList({ students }) {
   const [listStudents, setListStudents] = useState([]);
   const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
-
   const handleDelCheckbox = () => {
     const alertDel = window.confirm("Bạn có chắc muốn xoá không?");
     if (alertDel) {
-      const studentsStorage = localStorage.getItem("students")
-        ? JSON.parse(localStorage.getItem("students"))
-        : [];
-
-      const newStudents = [];
-      studentsStorage.forEach((student) => {
-        if (!checkedCheckboxes.includes(student.idStd))
-          newStudents.push(student);
-      });
-      localStorage.setItem("students", JSON.stringify(newStudents));
-      setListStudents(newStudents);
+      try {
+        axios
+          .delete("/delCheckBox", { data: checkedCheckboxes })
+          .then((res) => setListStudents(res.data))
+          .catch((err) => console.log(err));
+      } catch (error) {
+        console.log("Error: " + error);
+      }
     }
   };
   const handleCheck = (event, student) => {
@@ -33,18 +31,7 @@ export default memo(function StudentList({ students }) {
       });
     }
   };
-  useEffect(() => {
-    const studentsStorage = localStorage.getItem("students")
-      ? JSON.parse(localStorage.getItem("students"))
-      : [];
-    setListStudents(studentsStorage);
-  }, [students]);
-
-  // const handleEdit = (student) => {
-  //   if (idInput) idInput.current.disabled = true;
-  //   const url = `/addstudent?id=${student.idStd}&name=${student.nameStd}&birthday=${student.birthday}&gender=${student.genderChecked}&faculty=${student.faculty}`;
-  //   navigate(url);
-  // };
+  // console.log(checkedCheckboxes);
 
   // redux
   // const dispatch = useDispatch();
@@ -66,45 +53,93 @@ export default memo(function StudentList({ students }) {
     setStudent(student);
   };
   const handleDelete = (id) => {
-    const alertDel = window.confirm("Bạn có chắc muốn xoá không?");
-    if (alertDel) {
-      const newList = listStudents.filter((student) => student.idStd !== id);
-      localStorage.setItem("students", JSON.stringify(newList));
-      setListStudents(newList);
+    const confirm = window.confirm("Are you sure you want to delete");
+    try {
+      if (confirm)
+        axios
+          .delete(`/delStudent-${id}`)
+          .then((res) => setListStudents(res.data));
+    } catch (error) {
+      console.log("Error: " + error);
     }
   };
+  // const modal = (id) => (
+  //   <Modal show={true} size="md" popup={true} onClose={() => setShow(false)}>
+  //     <Modal.Header />
+  //     <Modal.Body>
+  //       <div className="text-center">
+  //         <div className="flex justify-center">
+  //           <svg
+  //             xmlns="http://www.w3.org/2000/svg"
+  //             fill="none"
+  //             viewBox="0 0 24 24"
+  //             strokeWidth={1.5}
+  //             stroke="currentColor"
+  //             className="w-14 h-14"
+  //           >
+  //             <path
+  //               strokeLinecap="round"
+  //               strokeLinejoin="round"
+  //               d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+  //             />
+  //           </svg>
+  //         </div>
+
+  //         <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+  //           Are you sure you want to delete this student?
+  //         </h3>
+  //         <div className="flex justify-center gap-4">
+  //           <Button color="failure" onClick={() => handleDelete(id)}>
+  //             Yes, I'm sure
+  //           </Button>
+  //           <Button color="gray" onClick={() => setShow(false)}>
+  //             No, cancel
+  //           </Button>
+  //         </div>
+  //       </div>
+  //     </Modal.Body>
+  //   </Modal>
+  // );
+
+  useEffect(() => {
+    try {
+      axios.get("/listStd").then((res) => setListStudents(res.data));
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  }, [students]);
+  // console.log(listStudents);
   return (
     <div className="mt-10">
-      <div className="mb-2 text-center">
-        <button
-          onClick={handleDelCheckbox}
-          className={`ml-3 bg-red-600 py-add px-5 rounded-md hover:opacity-70 text-white ${
-            checkedCheckboxes.length > 0 ? "inline-block" : "hidden"
-          }`}
-        >
-          Xoá checkbox
-        </button>
-      </div>
       <table className="w-full text-sm text-gray-500 text-center">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
-            <th scope="col" className="p-4"></th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6  h-20 w-52 text-xl ">
+              <button
+                onClick={handleDelCheckbox}
+                className={`p-10 bg-red-600 py-add  rounded-md hover:opacity-70 text-white ${
+                  checkedCheckboxes.length > 0 ? "inline-block" : "hidden"
+                }`}
+              >
+                Xoá
+              </button>
+            </th>
+            <th scope="col" className="px-6 py-3 text-xl">
               Mã SV
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-xl">
               Tên SV
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-xl">
               Ngày sinh
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-xl">
               Giới tính
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-xl">
               Khoa
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-xl">
               Hành động
             </th>
           </tr>
@@ -128,9 +163,11 @@ export default memo(function StudentList({ students }) {
                 {student.idStd}
               </td>
               <td className="px-6 py-4">{student.nameStd}</td>
-              <td className="px-6 py-4">{student.birthday}</td>
-              <td className="px-6 py-4">{student.genderChecked}</td>
-              <td className="px-6 py-4">{student.faculty}</td>
+              <td className="px-6 py-4">
+                {moment(student.birthday).format("MM/DD/YYYY")}
+              </td>
+              <td className="px-6 py-4">{student.gender}</td>
+              <td className="px-6 py-4">{student.nameFaculty}</td>
               <td className="px-6 py-4">
                 <button
                   onClick={() => handleEdit(student)}
@@ -139,7 +176,9 @@ export default memo(function StudentList({ students }) {
                   <Link to={"/addstudent"}>Sửa</Link>
                 </button>
                 <button
-                  onClick={() => handleDelete(student.idStd)}
+                  onClick={() => {
+                    handleDelete(student.idStd);
+                  }}
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
                 >
                   Xoá
