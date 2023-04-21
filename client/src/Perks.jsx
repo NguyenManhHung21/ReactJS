@@ -13,6 +13,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("wifi")}
           name="wifi"
           id=""
@@ -38,6 +39,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("parking")}
           name="parking"
           id=""
@@ -63,6 +65,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("tv")}
           name="tv"
           id=""
@@ -87,6 +90,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("pets")}
           name="pets"
           id=""
@@ -111,6 +115,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("radio")}
           name="radio"
           id=""
@@ -136,6 +141,7 @@ export default function Perks({ selected, onChange }) {
       <label className="border px-4 py-3 cursor-pointer flex items-center gap gap-2 rounded-2xl">
         <input
           type="checkbox"
+          className="rounded"
           checked={selected.includes("entrance")}
           name="entrance"
           id=""

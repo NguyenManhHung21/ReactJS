@@ -2,11 +2,11 @@ const Place = require("../models/Place");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "usadWdu32iUIAs4ad2";
 class PlacesController {
-  
   //show page main
   async getPlaces(req, res) {
     res.json(await Place.find());
   }
+
 
   //[GET] show a detail place when clicking on it
   async getPlace(req, res) {
@@ -60,16 +60,32 @@ class PlacesController {
     }
   }
 
-//   [POST] create a new place
-    async postPlace(req, res){
-      try {
-        const { token } = req.cookies;
-        if (!token) res.status(422).json("There are not data from UI!");
-        const {
+  //   [POST] create a new place
+  async postPlace(req, res) {
+    try {
+      const { token } = req.cookies;
+      if (!token) res.status(422).json("There are not data from UI!");
+      const {
+        name,
+        title,
+        address,
+        addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuests,
+        price,
+      } = req.body;
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        if (err) throw err;
+        const placeDoc = await Place.create({
+          owner: userData.id,
           name,
           title,
           address,
-          addedPhotos,
+          photos: addedPhotos,
           description,
           perks,
           extraInfo,
@@ -77,31 +93,14 @@ class PlacesController {
           checkOut,
           maxGuests,
           price,
-        } = req.body;
-        jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-          if (err) throw err;
-          const placeDoc = await Place.create({
-            owner: userData.id,
-            name,
-            title,
-            address,
-            photos: addedPhotos,
-            description,
-            perks,
-            extraInfo,
-            checkIn,
-            checkOut,
-            maxGuests,
-            price,
-          });
-          res.json(placeDoc);
         });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json(`Error: ${error}`);
-      }
+        res.json(placeDoc);
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(`Error: ${error}`);
     }
-    
+  }
 }
 
 module.exports = new PlacesController();

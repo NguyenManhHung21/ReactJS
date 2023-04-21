@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const Booking = new mongoose.Schema({
   place: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Place" },
   user: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -11,6 +10,4 @@ const Booking = new mongoose.Schema({
   price: Number,
 });
 
-const BookingModel = mongoose.model("Booking", Booking);
-
-module.exports = BookingModel;
+module.exports = mongoose.model("Booking", Booking);

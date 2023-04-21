@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongooseDelete = require("mongoose-delete");
+
 const { Schema } = mongoose;
 
 const Place = new Schema({
@@ -16,6 +18,6 @@ const Place = new Schema({
   price: Number,
 });
 
-const PlaceModel = mongoose.model("Place", Place);
+Place.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
-module.exports = PlaceModel;
+module.exports = mongoose.model("Place", Place);

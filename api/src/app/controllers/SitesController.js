@@ -1,4 +1,4 @@
-const PlaceModel = require("../models/Place");
+const Place = require("../models/Place");
 const User = require("../models/User");
 const jwtSecret = "usadWdu32iUIAs4ad2";
 const jwt = require("jsonwebtoken");
@@ -44,15 +44,27 @@ class SitesController {
       const { token } = req.cookies;
       jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         const { id } = userData;
-        const place = await PlaceModel.find({ owner: id });
-        res.json(place);
+        Promise.all([
+          await Place.find({ owner: id }),
+          await Place.countDocumentsDeleted({ owner: id }),
+        ]).then(([places, deleteCount]) => {
+          res.json({ places, deleteCount });
+        });
       });
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
-  }
 
-  
+    // try {
+    //   const { token } = req.cookies;
+    //   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    //     const { id } = userData;
+    //     res.json(await Place.find({ owner: id }));
+    //   });
+    // } catch (error) {
+    //   res.status(500).json({ error: "Internal Server Error" });
+    // }
+  }
 }
 
 module.exports = new SitesController();

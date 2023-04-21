@@ -3,15 +3,16 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
-require("dotenv").config();
+// require("dotenv").config();
 const app = express();
 const multer = require("multer");
 const fs = require("fs");
-
+const db = require("./src/config/db");
 const route = require("./src/routes");
 
 //IRVtd7spPJzJSwig
 app.use(express.json());
+
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(cookieParser());
 app.use(
@@ -20,7 +21,10 @@ app.use(
     origin: "http://127.0.0.1:5173",
   })
 );
-mongoose.connect(process.env.MONGO_URL);
+// mongoose.connect(process.env.MONGO_URL);
+
+//Connect to DB
+db.connect();
 
 //Routes init
 route(app);
@@ -58,5 +62,23 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
   }
   res.json(uploadFiles);
 });
+
+app.get(
+  "/middleware",
+  (req, res, next) => {
+    if (["vevip", "vethuong"].includes(req.query.ve)) {
+      req.weapon = "sword";
+      return next();
+    }
+    res.status(403).json({
+      message: "Go home and bring your tiket now!",
+    });
+  },
+  (req, res, next) => {
+    res.send(
+      `<h2 style="color: red;">Anh Hung dep trai dang cam ${req.weapon} </h2>`
+    );
+  }
+);
 
 app.listen(4000);

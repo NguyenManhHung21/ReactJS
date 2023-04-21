@@ -1,17 +1,57 @@
-const Booking = require("../models/Booking");
+const Place = require("../models/Place");
+const jwtSecret = "usadWdu32iUIAs4ad2";
+const jwt = require("jsonwebtoken");
 
 class DelPlaceController {
-  async delBookingPlace(req, res) {
-    const { id } = req.params;
+  softDelete(req, res, next) {
     try {
-      if (!id) {
-        res.status(422).json("id is not exist");
-        return;
-      }
-      await Booking.deleteOne({ _id: id });
-      res.status(200).json("delete was successful");
-    } catch (err) {
-      res.status(500).json("error: " + err.message);
+      const { token } = req.cookies;
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+        await Place.delete({ _id: req.params.id, owner: id });
+        res.status(200).json("soft-deleted was successful");
+      });
+    } catch (error) {
+      res.status(500).json("error: " + error);
+    }
+  }
+
+  getPlacesDeleted(req, res, next) {
+    try {
+      const { token } = req.cookies;
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+        res.json(await Place.findDeleted({ owner: id }));
+      });
+    } catch (error) {
+      res.status(500).json("error: " + error);
+    }
+  }
+
+  restorePlace(req, res, next) {
+    try {
+      const { token } = req.cookies;
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+        await Place.restore({ _id: req.params.id, owner: id });
+        // res.status(200).json("soft-deleted was successful");
+      });
+      res.status(200).json("restore successful");
+    } catch (error) {
+      res.status(500).json("error: " + error);
+    }
+  }
+
+  permanenceDeleted(req, res, next) {
+    try {
+      const { token } = req.cookies;
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+        await Place.deleteOne({ _id: req.params.id, owner: id });
+      });
+      res.status(200).json("delete successfully!");
+    } catch (error) {
+      res.status(500).json("error: " + error);
     }
   }
 }

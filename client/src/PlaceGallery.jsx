@@ -46,10 +46,11 @@ export default function PlaceGallery({ place }) {
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2">
         <div>
           {place.photos?.[0] && (
-            <div>
+            <div className="overflow-hidden">
               <img
+                // style={{transform: 'scale(1.2)'}}
                 onClick={() => setShowAllPhotos(true)}
-                className="aspect-square object-cover cursor-pointer"
+                className="aspect-square w-full object-cover cursor-pointer hover:transform hover:scale-110 transition ease duration-500"
                 src={`http://localhost:4000/uploads/${place.photos[0]}`}
                 alt=""
               />
@@ -57,12 +58,12 @@ export default function PlaceGallery({ place }) {
           )}
         </div>
         <div>
-          <div className="grid">
+          <div className="grid ">
             {place.photos?.[1] && (
-              <div>
+              <div className="overflow-hidden">
                 <img
                   onClick={() => setShowAllPhotos(true)}
-                  className="aspect-square object-cover cursor-pointer"
+                  className="aspect-square object-cover cursor-pointer hover:transform hover:scale-110 transition ease duration-500"
                   src={`http://localhost:4000/uploads/${place.photos[1]}`}
                   alt=""
                 />
@@ -72,7 +73,7 @@ export default function PlaceGallery({ place }) {
               <div className="overflow-hidden">
                 <img
                   onClick={() => setShowAllPhotos(true)}
-                  className="aspect-square object-cover cursor-pointer relative top-2"
+                  className="aspect-square object-cover cursor-pointer relative top-2 hover:transform hover:scale-110 transition ease duration-500"
                   src={`http://localhost:4000/uploads/${place.photos[2]}`}
                   alt=""
                 />

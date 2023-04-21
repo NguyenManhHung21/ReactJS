@@ -13,10 +13,10 @@ export default function IndexPage() {
       {places.length > 0 &&
         places.map((place) => (
           <Link to={"/places/" + place._id} key={place._id}>
-            <div className="bg-gray-500 rounded-2xl flex mb-2">
+            <div className="bg-gray-500 rounded-2xl flex mb-2 ">
               {place.photos?.[0] && (
                 <img
-                  className="rounded-2xl object-cover aspect-square"
+                  className="rounded-2xl object-cover aspect-square hover:transform hover:scale-105 transition ease duration-500"
                   src={"http://localhost:4000/uploads/" + place.photos?.[0]}
                   alt=""
                 />

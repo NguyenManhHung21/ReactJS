@@ -10,20 +10,36 @@ import { Button, Modal } from "flowbite-react";
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [showDel, setShowDel] = useState(false);
+  const [bookingId, setBookingId] = useState("");
+
+  const reloadData = () => {
+    try {
+      axios.get("/bookings").then((res) => {
+        setBookings(res.data);
+      });
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  };
+
   useEffect(() => {
-    axios.get("/bookings").then((res) => {
-      setBookings(res.data);
-    });
+    try {
+      axios.get("/bookings").then((res) => {
+        setBookings(res.data);
+      });
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
   }, []);
   const handleCancelPlace = (id) => {
-    axios
-      .delete(`/del-place/${id}`)
-      .then((res) => {
-        const updateBookings = bookings.filter((place) => place._id !== id);
-        setBookings(updateBookings);
+    try {
+      axios.delete(`/cancel-booking/${id}`).then(() => {
+        reloadData();
         toast.success("You have successfully canceled your reservation!");
-      })
-      .catch((err) => `Error: ${err}`);
+      });
+    } catch (error) {
+      console.error(`Error: ${err}`);
+    }
   };
   return (
     <div>
@@ -72,10 +88,11 @@ export default function BookingsPage() {
                 onClick={(e) => {
                   e.preventDefault();
                   setShowDel(true);
+                  setBookingId(booking._id);
                 }}
                 className="flex items-center bg-red-500 px-2 text-white hover:opacity-80"
               >
-                Cancel
+                Cancel&nbsp;
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -127,7 +144,7 @@ export default function BookingsPage() {
                         color="failure"
                         onClick={(e) => {
                           e.preventDefault();
-                          handleCancelPlace(booking._id);
+                          handleCancelPlace(bookingId);
                           setShowDel(false);
                         }}
                       >
@@ -148,6 +165,13 @@ export default function BookingsPage() {
               </Modal>
             </Link>
           ))}
+      </div>
+      <div>
+        {bookings.length == 0 && (
+          <h2 className="text-2xl text-center font-bold dark:text-white">
+            You have not book any places yet!
+          </h2>
+        )}
       </div>
     </div>
   );

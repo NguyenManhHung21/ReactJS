@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import {  Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import AccountNav from "../AccountNav";
 import { UserContext } from "../UserContext";
 import PlacesPage from "./PlacesPage";
+import { Spinner } from "flowbite-react";
 
 export default function ProfilePage() {
   const [redirect, setRedirect] = useState(null);
@@ -23,7 +24,12 @@ export default function ProfilePage() {
   if (redirect) return <Navigate to={redirect} />;
 
   if (!ready) {
-    return "Loading...";
+    return (
+      <>
+        <Spinner aria-label="Default status example" />
+        <h2>Loading...</h2>
+      </>
+    );
   }
 
   if (ready && !user && !redirect) {
