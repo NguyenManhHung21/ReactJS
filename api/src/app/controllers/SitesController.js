@@ -54,16 +54,23 @@ class SitesController {
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
+  }
 
-    // try {
-    //   const { token } = req.cookies;
-    //   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    //     const { id } = userData;
-    //     res.json(await Place.find({ owner: id }));
-    //   });
-    // } catch (error) {
-    //   res.status(500).json({ error: "Internal Server Error" });
-    // }
+  async getSearch(req, res, next) {
+    try {
+      const { q } = req.query;
+      const escapeRegExp = (string) =>
+        string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      // escapeRegExp(string) {
+      //   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+      // }
+      const places = await Place.find({
+        title: new RegExp(`${escapeRegExp(q)}`, "i"),
+      });
+      res.json(places);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

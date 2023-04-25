@@ -18,6 +18,7 @@ export default function PlacesPage() {
     try {
       axios.get("/user-places").then(({ data }) => {
         setPlaces(data.places);
+        setDeleteCount(data.deleteCount);
       });
     } catch (error) {
       console.error(`Error: ${error}`);

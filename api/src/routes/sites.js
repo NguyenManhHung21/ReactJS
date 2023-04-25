@@ -11,5 +11,8 @@ router.post("/logout", sitesController.logout);
 
 router.get("/user-places", sitesController.getPlaceOfUser);
 
+router.get("/getSearch", sitesController.getSearch);
+
+
 
 module.exports = router;

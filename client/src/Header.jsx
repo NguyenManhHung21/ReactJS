@@ -1,19 +1,62 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import { Button, Modal } from "flowbite-react";
 import axios from "axios";
 import PlaceImg from "./PlaceImg";
+import { Modal, Box } from "@mui/material";
+import replace from "react-string-replace";
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 3,
+  maxHeight: 600,
+  overflow: "auto",
+};
 
 export default function Header() {
   const { user } = useContext(UserContext);
   const [show, setShow] = useState(false);
+  const inputRef = useRef(null);
   const [places, setPlaces] = useState([]);
+  const [search, setSearch] = useState("");
+  const [numResults, setNumResults] = useState(5);
+  // const searchFirstPlace = useRef([]);
+  const escapeRegExp = (string) =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   useEffect(() => {
-    axios.get("/places").then((res) => setPlaces(res.data));
+    try {
+      const fetchPlaces = async () => {
+        const res = await axios.get("/places");
+        setPlaces(res.data);
+      };
+      fetchPlaces();
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
-  const handleSearch = () => {
-    setShow(true);
+  const searchResults = places.filter((place) =>
+    place.title.toLowerCase().includes(search.toLowerCase())
+  );
+  // useEffect(() => {
+  //   if (show) {
+  //     setTimeout(() => inputRef.current?.focus(), 10);
+  //     // console.log(inputRef.current);
+  //   }
+  // }, [show]);
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setNumResults(5);
+  };
+
+  const showMoreResults = () => {
+    setNumResults(numResults + 2); // tăng số lượng kết quả hiển thị lên
   };
   return (
     <header className=" flex justify-between">
@@ -42,28 +85,14 @@ export default function Header() {
         <div>Any week</div>
         <div className="after:border after:bordeL after:border-gray-300"></div>
         <div>Add guests</div>
-        {/* <button
-          onClick={handleSearch}
-          className="bg-primary text-white p-1 rounded-full"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-            />
-          </svg>
-        </button> */}
         <button
-          onClick={handleSearch}
-          className="bg-primary text-white p-1 rounded-full"
+          onClick={() => {
+            setShow(true);
+            setSearch("");
+            setTimeout(() => inputRef.current?.focus(), 5);
+            inputRef.current?.focus();
+          }}
+          className="bg-primary text-white p-1 rounded-full transition-transform hover:scale-110 duration-100 ease-in"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +100,7 @@ export default function Header() {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-4 h-4"
+            className="w-4 h-4 "
           >
             <path
               strokeLinecap="round"
@@ -80,14 +109,8 @@ export default function Header() {
             />
           </svg>
         </button>
-        <Modal
-          show={show}
-          size="2xl"
-          popup={true}
-          onClose={() => setShow(false)}
-        >
-          <Modal.Header />
-          <Modal.Body>
+        <Modal open={show} onClose={() => setShow(false)}>
+          <Box sx={style}>
             <div className="flex items-center">
               <div className="relative w-full">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -106,15 +129,18 @@ export default function Header() {
                   </svg>
                 </div>
                 <input
+                  ref={inputRef}
+                  value={search}
+                  // onKeyDown={handleSearch}
+                  onChange={handleSearch}
                   style={{ paddingLeft: "36px" }}
                   type="text"
-                  id="simple-search"
                   className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full "
                   placeholder="Search"
-                  required
                 />
               </div>
               <button
+                onClick={handleSearch}
                 type="submit"
                 className="p-2.5 ml-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
               >
@@ -137,27 +163,73 @@ export default function Header() {
             </div>
             <div>
               <div className="mt-4">
-                {places.length > 0 &&
-                  places.map((place) => (
+                {search.length != "" &&
+                  places.length > 0 &&
+                  searchResults.slice(0, numResults).map((place, index) => (
                     <Link
+                      // ref={(el) => (searchFirstPlace.current[index] = el)}
+                      onClick={() => setShow(false)}
                       key={place._id}
                       to={"/places/" + place._id}
-                      className="flex mt-4 cursor-pointer gap-x-4 bg-gray-100 p-4 rounded-2xl"
+                      className="flex items-center mt-4 cursor-pointer` gap-x-4 bg-gray-100 p-3 rounded-2xl hover:bg-blue-700 hover:text-white"
                     >
-                      <div className="flex w-9 h-9 bg-gray-300 grow-0 shrink-0">
-                        <PlaceImg place={place} />
+                      <div className="flex rounded-lg w-9 h-9 bg-gray-300 grow-0 shrink-0">
+                        <PlaceImg className="rounded-lg" place={place} />
                       </div>
                       <div className="grow shrink">
-                        <h2 className="text-xl">{place.title}</h2>
+                        {/* <h2 className="text-sm">{place.title}</h2> */}
+                        <h2 className="text-sm font-semibold">
+                          {replace(
+                            place.title,
+                            new RegExp(`(${escapeRegExp(search)})`, "gi"),
+                            (match, i) => (
+                              <span
+                                key={i}
+                                style={{ textDecoration: "underline" }}
+                              >
+                                {match}
+                              </span>
+                            )
+                          )}
+                        </h2>
+                      </div>
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                          />
+                        </svg>
                       </div>
                     </Link>
                   ))}
               </div>
             </div>
-          </Modal.Body>
-          {/* <Modal.Body>
-            
-          </Modal.Body> */}
+            <div className="mt-4 text-right ">
+              {search.length != "" && searchResults.length > numResults && (
+                <button
+                  className="text-blue-700 hover:opacity-80"
+                  onClick={showMoreResults}
+                >
+                  Show more...
+                </button>
+              )}
+            </div>
+            {search.length === 0 || searchResults.length === 0 ? (
+              <h2
+                before="No search results"
+                className="text-gray-400 before:content-[attr(before)]"
+              />
+            ) : null}
+          </Box>
         </Modal>
       </div>
 

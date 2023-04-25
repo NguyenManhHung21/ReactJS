@@ -1,12 +1,20 @@
 const Place = require("../models/Place");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "usadWdu32iUIAs4ad2";
+const User = require("../models/User");
 class PlacesController {
   //show page main
   async getPlaces(req, res) {
-    res.json(await Place.find());
+    const places = await Place.find().populate({
+      path: "owner",
+      select: "name -_id",
+    });
+    const result = places.map((place) => ({
+      ...place.toObject(),
+      name: place.owner.name, // replace the owner object with the name field
+    }));
+    res.json(result);
   }
-
 
   //[GET] show a detail place when clicking on it
   async getPlace(req, res) {
@@ -101,6 +109,7 @@ class PlacesController {
       res.status(500).json(`Error: ${error}`);
     }
   }
+  
 }
 
 module.exports = new PlacesController();

@@ -4,8 +4,8 @@ const mongooseDelete = require("mongoose-delete");
 const { Schema } = mongoose;
 
 const Place = new Schema({
-  owner: { type: mongoose.Schema.Types.ObjectId },
-  name: String,
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // xác định rằng owner là khoá ngoại của Place
+  // name: String,
   title: String,
   address: String,
   photos: [String],

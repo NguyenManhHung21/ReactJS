@@ -16,7 +16,7 @@ export default function IndexPage() {
             <div className="bg-gray-500 rounded-2xl flex mb-2 ">
               {place.photos?.[0] && (
                 <img
-                  className="rounded-2xl object-cover aspect-square hover:transform hover:scale-105 transition ease duration-500"
+                  className="rounded-2xl object-cover aspect-square hover:transform hover:scale-105 transition duration-300 ease-in"
                   src={"http://localhost:4000/uploads/" + place.photos?.[0]}
                   alt=""
                 />
@@ -28,7 +28,8 @@ export default function IndexPage() {
               <span className="font-bold ">Owner: </span> {place.name}
             </div>
             <div className="mt-1">
-              <span className="font-bold">${place.price}</span> per night
+              <span className="font-bold text-primary">${place.price}</span> per
+              night
             </div>
           </Link>
         ))}
