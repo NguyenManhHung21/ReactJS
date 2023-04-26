@@ -34,7 +34,7 @@ export default function Header() {
     try {
       const fetchPlaces = async () => {
         const res = await axios.get("/places");
-        setPlaces(res.data);
+        setPlaces(res.data.results);
       };
       fetchPlaces();
     } catch (error) {

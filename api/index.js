@@ -21,7 +21,6 @@ app.use(
     origin: "http://127.0.0.1:5173",
   })
 );
-// mongoose.connect(process.env.MONGO_URL);
 
 //Connect to DB
 db.connect();
@@ -30,23 +29,29 @@ db.connect();
 route(app);
 
 //endpoint
-app.post("/upload-by-link", async (req, res) => {
-  try {
-    const { link } = req.body;
-    if (!link) {
-      res.status(422).json("You need to fill out img url!");
-      return;
+app.post(
+  "/upload-by-link",
+  async (req, res) => {
+    try {
+      const { link } = req.body;
+      if (!link) {
+        res.status(422).json("You need to fill out img url!");
+        return;
+      }
+      const newName = "/photo" + Date.now() + ".jpg";
+
+      await download.image({
+        url: link,
+        dest: __dirname + "/uploads" + newName,
+      });
+
+      res.json(newName);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
-    const newName = "/photo" + Date.now() + ".jpg";
-
-    await download.image({ url: link, dest: __dirname + "/uploads" + newName });
-
-    res.json(newName);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
-});
+);
 
 const photosMiddleware = multer({ dest: "uploads/" });
 //endpoint

@@ -16,6 +16,14 @@ textarea {
 button.primary {
   @apply bg-primary p-2 w-full text-white rounded-lg mt-3;
 }
+
+/* li[aria-current="page"]{
+  bg
+} */
+li[aria-current="page"] button {
+  color: rgb(28 100 242);
+  background: rgb(235 245 255);
+}
 /* .max-w-6xl
 {
   max-width: unset !important;

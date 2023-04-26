@@ -4,16 +4,58 @@ const jwtSecret = "usadWdu32iUIAs4ad2";
 const User = require("../models/User");
 class PlacesController {
   //show page main
-  async getPlaces(req, res) {
-    const places = await Place.find().populate({
-      path: "owner",
-      select: "name -_id",
-    });
-    const result = places.map((place) => ({
+  getPlaces(req, res) {
+    const results = res.paginatedResults.results.map((place) => ({
       ...place.toObject(),
-      name: place.owner.name, // replace the owner object with the name field
+      owner: place.owner.name, // replace the owner object with the name field
     }));
-    res.json(result);
+    // res.json(res.paginatedResults);
+    res.json({ ...res.paginatedResults, results });
+  }
+
+  paginatedResults(model) {
+    return async (req, res, next) => {
+      const page = parseInt(req.query.page);
+      const limit = parseInt(req.query.limit);
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      const results = {};
+
+      const modelList = await model.find();
+
+      if (endIndex < modelList.length) {
+        results.next = {
+          page: page + 1,
+          limit,
+        };
+      }
+
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit,
+        };
+      }
+      try {
+        // results.results = modelList.slice(startIndex, endIndex);
+        results.results = await model
+          .find()
+          .populate({
+            path: "owner",
+            select: "name -_id",
+          })
+          .limit(limit)
+          .skip(startIndex)
+          .exec();
+        res.paginatedResults = results;
+
+        next();
+      } catch (error) {
+        res.status(500).json({ message: error });
+      }
+    };
   }
 
   //[GET] show a detail place when clicking on it
@@ -109,7 +151,6 @@ class PlacesController {
       res.status(500).json(`Error: ${error}`);
     }
   }
-  
 }
 
 module.exports = new PlacesController();

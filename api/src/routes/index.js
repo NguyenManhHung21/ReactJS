@@ -5,6 +5,7 @@ const registrationRouter = require("./registration");
 const sitesRouter = require("./sites");
 const cancelBooking = require("./cancelBooking");
 const delPlace = require("./delPlace");
+
 function route(app) {
   app.use("/places", placesRouter);
   app.use("/bookings", bookingsRouter);
