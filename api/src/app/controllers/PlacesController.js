@@ -1,6 +1,7 @@
+require("dotenv").config();
 const Place = require("../models/Place");
 const jwt = require("jsonwebtoken");
-const jwtSecret = "usadWdu32iUIAs4ad2";
+const jwtSecret = process.env.JWT_SECRET_KEY;
 const User = require("../models/User");
 class PlacesController {
   //show page main
@@ -39,7 +40,6 @@ class PlacesController {
         };
       }
       try {
-        // results.results = modelList.slice(startIndex, endIndex);
         results.results = await model
           .find()
           .populate({

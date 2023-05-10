@@ -1,7 +1,8 @@
+require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const UserModel = require("../models/User");
 const jwt = require("jsonwebtoken");
-const jwtSecret = "usadWdu32iUIAs4ad2";
+const jwtSecret = process.env.JWT_SECRET_KEY;
 
 
 class LoginController {

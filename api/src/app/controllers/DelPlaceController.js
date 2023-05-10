@@ -1,5 +1,6 @@
+require("dotenv").config();
 const Place = require("../models/Place");
-const jwtSecret = "usadWdu32iUIAs4ad2";
+const jwtSecret = process.env.JWT_SECRET_KEY;
 const jwt = require("jsonwebtoken");
 
 class DelPlaceController {

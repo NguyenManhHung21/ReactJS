@@ -1,17 +1,18 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import AccountNav from "../AccountNav";
-import PlaceImg from "../PlaceImg";
+import AccountNav from "../components/AccountNav";
+import PlaceImg from "../components/PlaceImg";
 import { Link } from "react-router-dom";
-import BookingDates from "../BookingDates";
+import BookingDates from "../components/BookingDates";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Button, Modal } from "flowbite-react";
+import PayButton from "../components/PayButton";
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [showDel, setShowDel] = useState(false);
   const [bookingId, setBookingId] = useState("");
-
+  // const [subtotal, setSubtotal] = useState('');
   const reloadData = () => {
     try {
       axios.get("/bookings").then((res) => {
@@ -77,8 +78,9 @@ export default function BookingsPage() {
                         d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
                       />
                     </svg>
-                    <span className="text-2xl">
-                      Total price: ${booking.price}
+                    <span className="text-2xl ">
+                      Total price:{" "}
+                      <strong className="text-primary">${booking.price}</strong>
                     </span>
                   </div>
                 </div>
@@ -116,6 +118,7 @@ export default function BookingsPage() {
                   e.preventDefault();
                   setShowDel(false);
                 }}
+                
               >
                 <Modal.Header />
                 <Modal.Body>
@@ -165,6 +168,20 @@ export default function BookingsPage() {
               </Modal>
             </Link>
           ))}
+        {bookings.length !== 0 && (
+          <div className="mt-5 flex flex-col items-end">
+            <div className="w-1/3 text-2xl flex justify-between ">
+              <p>Subtotal</p>
+              <strong>
+                ${bookings.reduce((total, booking) => total + booking.price, 0)}
+              </strong>
+            </div>
+            <p className="w-1/3 text-gray-400 mt-2">
+              Taxes and shipping calculated at checkout
+            </p>
+            <PayButton bookings={bookings} />
+          </div>
+        )}
       </div>
       <div>
         {bookings.length == 0 && (

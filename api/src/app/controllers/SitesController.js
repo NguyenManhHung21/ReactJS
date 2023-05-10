@@ -1,7 +1,11 @@
 const Place = require("../models/Place");
 const User = require("../models/User");
-const jwtSecret = "usadWdu32iUIAs4ad2";
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const jwtSecret = process.env.JWT_SECRET_KEY;
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_KEY);
+
 class SitesController {
   async validationEmailRegis(req, res) {
     const { email } = req.params;
@@ -23,8 +27,8 @@ class SitesController {
       if (token) {
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
           if (err) throw err;
-          const { name, email, _id } = await User.findById(userData.id);
-          res.json({ name, email, _id });
+          const { name, email, _id, slug } = await User.findById(userData.id);
+          res.json({ name, email, _id, slug });
         });
       } else {
         res.json(null);
@@ -71,6 +75,39 @@ class SitesController {
     } catch (error) {
       next(error);
     }
+  }
+
+  async payment(req, res) {
+    const { slugName } = req.body;
+    const { bookings } = req.body;
+    const line_items = bookings.map((item) => {
+      // const imageUrl = item.place.photos[0];
+      // const imageBlob = await fetch(imageUrl).then((response) =>
+      //   response.blob()
+      // );
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.place.title,
+            // images: [URL.createObjectURL(imageBlob)],
+            description: item.place.address,
+            metadata: {
+              id: item._id,
+            },
+          },
+          unit_amount: item.price * 100,
+        },
+        quantity: 1,
+      };
+    });
+    const session = await stripe.checkout.sessions.create({
+      line_items,
+      mode: "payment",
+      success_url: `${process.env.CLIENT_URL}/account/bookings/${slugName}/checkout-success`,
+      cancel_url: `${process.env.CLIENT_URL}/account/bookings`,
+    });
+    res.send({ url: session.url });
   }
 }
 

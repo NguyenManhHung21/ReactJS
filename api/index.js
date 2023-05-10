@@ -3,7 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
-// require("dotenv").config();
+require("dotenv").config();
 const app = express();
 const multer = require("multer");
 const fs = require("fs");
@@ -14,14 +14,15 @@ const route = require("./src/routes");
 app.use(express.json());
 
 app.use("/uploads", express.static(__dirname + "/uploads"));
+
 app.use(cookieParser());
+
 app.use(
   cors({
     credentials: true,
-    origin: "http://127.0.0.1:5173",
+    origin: process.env.CLIENT_URL,
   })
 );
-
 //Connect to DB
 db.connect();
 
@@ -29,29 +30,26 @@ db.connect();
 route(app);
 
 //endpoint
-app.post(
-  "/upload-by-link",
-  async (req, res) => {
-    try {
-      const { link } = req.body;
-      if (!link) {
-        res.status(422).json("You need to fill out img url!");
-        return;
-      }
-      const newName = "/photo" + Date.now() + ".jpg";
-
-      await download.image({
-        url: link,
-        dest: __dirname + "/uploads" + newName,
-      });
-
-      res.json(newName);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
+app.post("/upload-by-link", async (req, res) => {
+  try {
+    const { link } = req.body;
+    if (!link) {
+      res.status(422).json("You need to fill out img url!");
+      return;
     }
+    const newName = "/photo" + Date.now() + ".jpg";
+
+    await download.image({
+      url: link,
+      dest: __dirname + "/uploads" + newName,
+    });
+
+    res.json(newName);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
-);
+});
 
 const photosMiddleware = multer({ dest: "uploads/" });
 //endpoint

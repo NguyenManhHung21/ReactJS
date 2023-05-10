@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import AccountNav from "../AccountNav";
-import PlaceImg from "../PlaceImg";
+import AccountNav from "../components/AccountNav";
+import PlaceImg from "../components/PlaceImg";
 import { Button, Modal, Spinner, Tooltip } from "flowbite-react";
 import { toast } from "react-toastify";
 import { UserContext } from "../UserContext";

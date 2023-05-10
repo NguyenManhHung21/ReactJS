@@ -5,6 +5,8 @@ import { UserContext } from "../UserContext";
 import React from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TextField } from "@mui/material";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +43,7 @@ export default function LoginPage() {
             className="w-full border px-2 py-3 rounded-tl-lg rounded-tr-lg"
             type="email"
             name=""
-            placeholder="your@email.com"
+            placeholder="Your@email.com"
             id=""
           />
           <input

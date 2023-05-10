@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import AccountNav from "../AccountNav";
+import AccountNav from "../components/AccountNav";
 import { UserContext } from "../UserContext";
 import PlacesPage from "./PlacesPage";
 import { Spinner } from "flowbite-react";
@@ -41,9 +41,12 @@ export default function ProfilePage() {
     <div>
       <AccountNav />
       {subpage === "profile" && (
-        <div className="text-center max-w-lg mx-auto">
-          Logged in as {user.name} ({user.email}) <br />
-          <button onClick={logout} className="primary max-w-sm mt-2">
+        <div className="text-center max-w-lg mx-auto mt-20">
+          <p className="text-lg">
+            Logged in as {user.name} ({user.email})
+          </p>
+          <br />
+          <button onClick={logout} className="primary max-w-sm mt-2 hover:opacity-80">
             Logout
           </button>
         </div>

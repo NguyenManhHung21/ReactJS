@@ -1,7 +1,7 @@
-
+require("dotenv").config();
 const Booking = require("../models/Booking");
 const jwt = require("jsonwebtoken");
-const jwtSecret = "usadWdu32iUIAs4ad2";
+const jwtSecret = process.env.JWT_SECRET_KEY;
 
 //lấy ra 1 user
 const getUserDataFromReq = (req) => {

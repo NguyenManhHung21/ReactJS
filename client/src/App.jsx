@@ -13,6 +13,8 @@ import PlacePage from "./pages/PlacePage";
 import BookingsPage from "./pages/BookingsPage";
 import BookingPage from "./pages/BookingPage";
 import TrashedPlacesPage from "./pages/TrashedPlacesPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 axios.defaults.baseURL = "http://127.0.0.1:4000";
 axios.defaults.withCredentials = true;
 
@@ -35,8 +37,12 @@ function App() {
           <Route path="/places/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
-          <Route path="/account/bookings/:id" element={<BookingPage />} />
+          <Route
+            path="/account/bookings/:slug/checkout-success"
+            element={<CheckoutSuccessPage />}
+          />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </UserContextProvider>
     // các thành phần bên trong provider sẽ có thể truy cập vào các values mà UserContextProvider cung cấp

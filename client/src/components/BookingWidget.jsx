@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { differenceInCalendarDays } from "date-fns";
 import axios from "axios";
-import { UserContext } from "./UserContext";
+import { UserContext } from "../UserContext";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,6 +29,10 @@ export default function BookingWidget({ place }) {
   }
   const bookThisPlace = async () => {
     try {
+      if (!user) {
+        toast.error("You need to login before booking!");
+        return;
+      }
       if (place.owner === user._id) {
         toast.error("You can not book this place. Cause you are the owner!");
         return;
@@ -43,7 +47,7 @@ export default function BookingWidget({ place }) {
         price: numberOfNights * place.price,
       });
       const bookingId = response.data._id;
-      setRedirect(`/account/bookings/${bookingId}`);
+      setRedirect(`/account/bookings`);
       toast.success("The reservation was successful!");
     } catch (err) {
       toast.error("You need to enter all of fields!");
@@ -61,6 +65,7 @@ export default function BookingWidget({ place }) {
           <div className=" px-4 py-3">
             <label>Check in:</label>
             <input
+              className="rounded-xl"
               type="date"
               value={checkIn}
               onChange={(e) => setCheckIn(e.target.value)}
@@ -69,6 +74,7 @@ export default function BookingWidget({ place }) {
           <div className=" px-4 py-3 border-l">
             <label>Check out:</label>
             <input
+              className="rounded-xl"
               type="date"
               value={checkOut}
               onChange={(e) => setCheckOut(e.target.value)}

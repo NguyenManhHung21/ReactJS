@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import AccountNav from "../AccountNav";
-import Perks from "../Perks";
-import PhotosUploader from "../PhotosUploader";
+import AccountNav from "../components/AccountNav";
+import Perks from "../components/Perks";
+import PhotosUploader from "../components/PhotosUploader";
 import { UserContext } from "../UserContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -117,14 +117,14 @@ export default function PlacesFormPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           type="text"
-          placeholder="title, for example: My lovely apt"
+          placeholder="Title, for example: My lovely apt"
         />
         {preInput("Address", "Address to this place")}
         <input
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           type="text"
-          placeholder="address"
+          placeholder="Place's location"
         />
         {preInput("Photos", "more = better")}
         <PhotosUploader addedPhotos={addedPhotos} onChange={setAddedPhotos} />
