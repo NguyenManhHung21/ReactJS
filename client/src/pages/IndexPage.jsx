@@ -2,12 +2,14 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../UserContext";
-import { Pagination } from "flowbite-react";
+import { Pagination, Spinner } from "flowbite-react";
 
 export default function IndexPage() {
   const [places, setPlaces] = useState([]);
   const [indexPage, setIndexPage] = useState(1);
   const [totalPage, setTotalPage] = useState("");
+  const { ready } = useContext(UserContext);
+
   const itemsPerPage = 12;
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -23,6 +25,14 @@ export default function IndexPage() {
   const onPageChange = (currentPage) => {
     setIndexPage(currentPage);
   };
+  if (!ready) {
+    return (
+      <div className="m-auto text-center">
+        <Spinner aria-label="Default status example" />
+        <h2 className="mt-3 text-xl">Loading...</h2>
+      </div>
+    );
+  }
   return (
     <>
       <div className=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap gap-x-6 gap-y-8 mt-8">

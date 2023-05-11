@@ -47,10 +47,10 @@ export default function PlacesPage() {
   };
   if (!ready) {
     return (
-      <>
+      <div className="m-auto text-center">
         <Spinner aria-label="Default status example" />
-        <h2>Loading...</h2>
-      </>
+        <h2 className="mt-3 text-xl">Loading...</h2>
+      </div>
     );
   }
   return (

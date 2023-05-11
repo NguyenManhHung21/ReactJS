@@ -1,18 +1,20 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AccountNav from "../components/AccountNav";
 import PlaceImg from "../components/PlaceImg";
 import { Link } from "react-router-dom";
 import BookingDates from "../components/BookingDates";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Button, Modal } from "flowbite-react";
+import { Button, Modal, Spinner } from "flowbite-react";
 import PayButton from "../components/PayButton";
+import { UserContext } from "../UserContext";
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [showDel, setShowDel] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  // const [subtotal, setSubtotal] = useState('');
+  const { ready } = useContext(UserContext);
+
   const reloadData = () => {
     try {
       axios.get("/bookings").then((res) => {
@@ -42,6 +44,14 @@ export default function BookingsPage() {
       console.error(`Error: ${err}`);
     }
   };
+  if (!ready) {
+    return (
+      <div className="m-auto text-center">
+        <Spinner aria-label="Default status example" />
+        <h2 className="mt-3 text-xl">Loading...</h2>
+      </div>
+    );
+  }
   return (
     <div>
       <AccountNav />
@@ -118,7 +128,6 @@ export default function BookingsPage() {
                   e.preventDefault();
                   setShowDel(false);
                 }}
-                
               >
                 <Modal.Header />
                 <Modal.Body>

@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 const multer = require("multer");
 const fs = require("fs");
-const db = require("./src/config/db");
+// const db = require("./src/config/db");
 const route = require("./src/routes");
 
 //IRVtd7spPJzJSwig
@@ -24,8 +24,8 @@ app.use(
   })
 );
 //Connect to DB
-db.connect();
-
+// db.connect();
+mongoose.connect(process.env.MONGO_URL);
 //Routes init
 route(app);
 
