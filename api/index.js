@@ -26,10 +26,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: [
-      "http://127.0.0.1:2001/",
-      "https://bookingapp--rad-bombolone-4f1368.netlify.app/",
-    ],
+    origin: "*",
   })
 );
 //Connect to DB
