@@ -30,7 +30,7 @@ const connect = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
-      useUnifiedToology: true,
+      useUnifiedTopology: true,
     });
     console.log("connect succeefully");
   } catch (error) {
