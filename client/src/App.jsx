@@ -15,7 +15,8 @@ import BookingPage from "./pages/BookingPage";
 import TrashedPlacesPage from "./pages/TrashedPlacesPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
-axios.defaults.baseURL = "http://127.0.0.1:4000";
+// axios.defaults.baseURL = "http://127.0.0.1:4000";
+axios.defaults.baseURL = "https://booking-app-wiux.onrender.com";
 axios.defaults.withCredentials = true;
 
 function App() {
