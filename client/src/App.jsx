@@ -20,6 +20,7 @@ axios.defaults.baseURL = "https://booking-app-wiux.onrender.com";
 axios.defaults.withCredentials = true;
 
 function App() {
+  console.log(process.env.URL_API);
   return (
     <UserContextProvider>
       <Routes>
