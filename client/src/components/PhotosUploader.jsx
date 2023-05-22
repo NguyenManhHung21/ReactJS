@@ -2,9 +2,13 @@ import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useContext } from "react";
+import { UserContext } from "../UserContext";
 
 export default function PhotosUploader({ addedPhotos, onChange }) {
   const [photoLink, setPhotoLink] = useState("");
+  const {  api } = useContext(UserContext);
+
   const addPhotoByLink = async (e) => {
     e.preventDefault();
     try {
@@ -80,7 +84,7 @@ export default function PhotosUploader({ addedPhotos, onChange }) {
             <div className="h-32 flex relative" key={link}>
               <img
                 className="rounded-2xl w-full object-cover"
-                src={`${process.env.URL_API}/uploads/` + link}
+                src={`${api}/uploads/` + link}
               />
               <button
                 onClick={(e) => removePhoto(e, link)}
