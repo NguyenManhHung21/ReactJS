@@ -11,6 +11,7 @@ export default function IndexPage() {
   const [totalPage, setTotalPage] = useState("");
   const { ready } = useContext(UserContext);
   const itemsPerPage = 12;
+
   useEffect(() => {
     const fetchPlaces = async () => {
       const { data } = await axios.get("/places");
