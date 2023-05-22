@@ -5,7 +5,7 @@ import { UserContext } from "../UserContext";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-export default function BookingWidget({ place }) {
+export default function BookedWidget({ place }) {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [numberOfGuests, setNumberOfGuests] = useState(1);
@@ -33,6 +33,11 @@ export default function BookingWidget({ place }) {
         toast.error("You need to login before booking!");
         return;
       }
+      booked.forEach((book) => {
+        if (book.place == place._id) {
+          console.log("đã đặt");
+        }
+      });
       if (place.owner === user._id) {
         toast.error("You can not book this place. Cause you are the owner!");
         return;
@@ -46,11 +51,11 @@ export default function BookingWidget({ place }) {
         phone,
         price: numberOfNights * place.price,
       });
-      // const bookingId = response.data._id;
+      const bookingId = response.data._id;
       setRedirect(`/account/bookings`);
       toast.success("The reservation was successful!");
     } catch (err) {
-      toast.warning("You need to enter all of fields!");
+      toast.error("You need to enter all of fields!");
     }
   };
 
@@ -63,20 +68,22 @@ export default function BookingWidget({ place }) {
         night
       </div>
       <div className="bg-white border rounded-2xl mt-4">
-        <div className="md:flex ">
+        <div className="flex">
           <div className=" px-4 py-3">
             <label>Check in:</label>
             <input
-              className="rounded-xl w-full"
+              disabled
+              className="rounded-xl"
               type="date"
               value={checkIn}
               onChange={(e) => setCheckIn(e.target.value)}
             />
           </div>
-          <div className=" px-4 py-3 md:border-l border-t">
+          <div className=" px-4 py-3 border-l">
             <label>Check out:</label>
             <input
-              className="rounded-xl w-full"
+              disabled
+              className="rounded-xl"
               type="date"
               value={checkOut}
               onChange={(e) => setCheckOut(e.target.value)}
@@ -86,6 +93,7 @@ export default function BookingWidget({ place }) {
         <div className="px-4 py-2 border-t">
           <label>Number of guests</label>
           <input
+            disabled
             type="number"
             value={numberOfGuests}
             onChange={(e) => setNumberOfGuests(e.target.value)}
@@ -108,14 +116,9 @@ export default function BookingWidget({ place }) {
           </div>
         )}
       </div>
-      <button
-        onClick={bookThisPlace}
-        className="primary mt-4 font-semibold hover:opacity-80"
-      >
-        <span className="md:inline hidden">Book this place &nbsp;</span>
-
-        {numberOfNights && <span>${numberOfNights * place.price}</span>}
-      </button>
+      <div className="bg-gray-400 py-3 mt-4 text-white rounded-xl text-center font-semibold border border-gray-300">
+        The place is already booked!
+      </div>
     </div>
   );
 }

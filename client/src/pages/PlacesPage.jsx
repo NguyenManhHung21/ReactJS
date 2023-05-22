@@ -123,7 +123,7 @@ export default function PlacesPage() {
                   setShowDel(true);
                   setPlaceId(place._id);
                 }}
-                className="flex items-center -mt-4 -mr-4 bg-red-500 px-2 text-white hover:opacity-80 "
+                className="flex items-center -mt-4 -mr-4 bg-red-500 px-1 text-white hover:opacity-80 "
               >
                 Delete&nbsp;
                 <svg

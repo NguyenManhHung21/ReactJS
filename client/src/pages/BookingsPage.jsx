@@ -17,7 +17,7 @@ export default function BookingsPage() {
 
   const reloadData = () => {
     try {
-      axios.get("/bookings").then((res) => {
+      axios.get("bookings/by-account").then((res) => {
         setBookings(res.data);
       });
     } catch (error) {
@@ -27,7 +27,7 @@ export default function BookingsPage() {
 
   useEffect(() => {
     try {
-      axios.get("/bookings").then((res) => {
+      axios.get("bookings/by-account").then((res) => {
         setBookings(res.data);
       });
     } catch (error) {
@@ -41,7 +41,7 @@ export default function BookingsPage() {
         toast.success("You have successfully canceled your reservation!");
       });
     } catch (error) {
-      console.error(`Error: ${err}`);
+      console.error(`Error: ${error}`);
     }
   };
   if (!ready) {
@@ -102,7 +102,7 @@ export default function BookingsPage() {
                   setShowDel(true);
                   setBookingId(booking._id);
                 }}
-                className="flex items-center bg-red-500 px-2 text-white hover:opacity-80"
+                className="flex items-center bg-red-500 px-1 text-white hover:opacity-80"
               >
                 Cancel&nbsp;
                 <svg

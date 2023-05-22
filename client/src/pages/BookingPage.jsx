@@ -10,7 +10,7 @@ export default function BookingPage() {
   const { id } = useParams();
   useEffect(() => {
     if (id) {
-      axios.get("/bookings").then((res) => {
+      axios.get("bookings/by-account").then((res) => {
         const foundBooking = res.data.find(({ _id }) => _id === id);
         if (foundBooking) setBooking(foundBooking);
       });

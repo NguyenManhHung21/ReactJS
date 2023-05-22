@@ -48,9 +48,7 @@ export default function PlaceGallery({ place }) {
           {place.photos?.[0] && (
             <div className="overflow-hidden">
               <img
-                // style={{transform: 'scale(1.2)'}}
-                onClick={() => setShowAllPhotos(true)}
-                className="aspect-square w-full object-cover cursor-pointer hover:transform hover:scale-110 transition ease duration-500"
+                className="aspect-square w-full object-cover hover:transform hover:scale-110 transition ease duration-500"
                 src={`http://localhost:4000/uploads/${place.photos[0]}`}
                 alt=""
               />
@@ -62,8 +60,7 @@ export default function PlaceGallery({ place }) {
             {place.photos?.[1] && (
               <div className="overflow-hidden">
                 <img
-                  onClick={() => setShowAllPhotos(true)}
-                  className="aspect-square object-cover cursor-pointer hover:transform hover:scale-110 transition ease duration-500"
+                  className="aspect-square object-cover hover:transform hover:scale-110 transition ease duration-500"
                   src={`http://localhost:4000/uploads/${place.photos[1]}`}
                   alt=""
                 />
@@ -72,8 +69,7 @@ export default function PlaceGallery({ place }) {
             {place.photos?.[2] && (
               <div className="overflow-hidden">
                 <img
-                  onClick={() => setShowAllPhotos(true)}
-                  className="aspect-square object-cover cursor-pointer relative top-2 hover:transform hover:scale-110 transition ease duration-500"
+                  className="aspect-square object-cover relative top-2 hover:transform hover:scale-110 transition ease duration-500"
                   src={`http://localhost:4000/uploads/${place.photos[2]}`}
                   alt=""
                 />
@@ -84,7 +80,7 @@ export default function PlaceGallery({ place }) {
       </div>
       <button
         onClick={() => setShowAllPhotos(true)}
-        className="flex gap-2 absolute right-2 bottom-2 py-2 px-4 bg-white rounded-2xl border shadow-md shadow-gray-500"
+        className="flex gap-2 absolute right-2 bottom-2 py-2 px-4 bg-white rounded-2xl border shadow-md shadow-gray-500 hover:bg-amber-300 hover:text-white hover:border-amber-600"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

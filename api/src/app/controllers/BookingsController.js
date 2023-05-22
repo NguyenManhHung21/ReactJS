@@ -18,7 +18,7 @@ const getUserDataFromReq = (req) => {
 
 class BookingsController {
   //[GET] / bookings
-  async getBookings(req, res) {
+  async getBookingsByAccount(req, res) {
     try {
       const userData = await getUserDataFromReq(req);
       res.json(await Booking.find({ user: userData.id }).populate("place"));
@@ -26,6 +26,15 @@ class BookingsController {
       res.status(500).send("Internal Server Error");
     }
   }
+
+  async getBookings(req, res) {
+    try {
+      res.json(await Booking.find());
+    } catch (error) {
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
 
   // [POST]
   async postBookings(req, res) {

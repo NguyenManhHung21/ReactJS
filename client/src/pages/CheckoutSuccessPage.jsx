@@ -1,6 +1,16 @@
+import axios from "axios";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function CheckoutSuccessPage() {
+  useEffect(() => {
+    try {
+      axios.delete("/paid-bookings");
+    } catch (error) {
+      console.error(`Error: ${error}`);
+
+    }
+  }, []);
   return (
     <div className="text-center mt-16">
       <h2 className="text-primary text-3xl font-sans font-extrabold">

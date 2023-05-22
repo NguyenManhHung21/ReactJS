@@ -14,6 +14,15 @@ class CancellBookingController {
       res.status(500).json("error: " + err.message);
     }
   }
+
+  async paidBookingPlaces(req, res) {
+    try {
+      await Booking.deleteMany();
+      res.status(200).json("checkout successfully");
+    } catch (err) {
+      res.status(500).json("error: " + err.message);
+    }
+  }
 }
 
 module.exports = new CancellBookingController();
