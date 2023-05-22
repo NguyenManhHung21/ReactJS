@@ -26,9 +26,21 @@ app.use(
 
 //Connect to DB
 // db.connect();
-mongoose.connect(process.env.MONGO_URL);
+const connect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedToology: true,
+    });
+    console.log("connect succeefully");
+  } catch (error) {
+    console.log("error: ", error);
+  }
+};
 //Routes init
 route(app);
+
+app.get("/", async (req, res) => res.send("Api successfully"));
 
 //endpoint
 app.post("/upload-by-link", async (req, res) => {
@@ -85,4 +97,4 @@ app.get(
   }
 );
 
-app.listen(4000);
+app.listen(4000, () => connect());
