@@ -6,7 +6,7 @@ export const UserContext = createContext();
 export function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
-  const api = "https://booking-app-wiux.onrender.com/";
+  const api = "https://booking-app-wiux.onrender.com";
   useEffect(() => {
     if (!user) {
       axios.get("/profile").then(({ data }) => {
