@@ -2,7 +2,7 @@ import { Box, TextField, Typography } from '@mui/material';
 import styled from 'styled-components';
 import React, { useState } from 'react';
 import Logo from '../assets/logo.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast, ToastOptions } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
@@ -10,7 +10,7 @@ import { registerRoute } from '../utils/APIRoutes';
 const Container = styled(Box)`
   width: 100vw;
   height: 100vh;
-  background-color: #071952;
+  background-color: #131324;
   display: flex;
   img {
     width: 3.5rem;
@@ -57,13 +57,14 @@ const Container = styled(Box)`
     }
   }
 `;
-interface IRegister {
+export interface IRegister {
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 const Register = () => {
+  const navigate = useNavigate();
   const [registerUser, setRegisterUser] = useState<IRegister>({
     username: '',
     email: '',
@@ -80,7 +81,7 @@ const Register = () => {
   const handleChange = (e: any) => {
     setRegisterUser((prev: IRegister) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     const { username, email, password, confirmPassword } = registerUser;
     e.preventDefault();
     if (username.length < 3) {
@@ -100,7 +101,16 @@ const Register = () => {
       return;
     }
     try {
-      axios.post(registerRoute, {registerUser});
+      const { data }: any = await axios.post(registerRoute, {
+        username,
+        email,
+        password,
+      });
+      console.log(data);
+      if (data.status) {
+        toast.success('Registrations successfully!', toastOptions);
+        navigate('/login');
+      } else toast.error(data.msg, toastOptions);
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +122,7 @@ const Register = () => {
         flexDirection="column"
         alignContent="center"
         m="auto"
-        sx={{ backgroundColor: '#090580', borderRadius: '1rem' }}
+        sx={{ backgroundColor: '#00000076', borderRadius: '1rem' }}
         p="5rem 5rem"
       >
         <Box display="flex" justifyContent="center" gap={1}>
