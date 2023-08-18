@@ -16,13 +16,13 @@ import TrashedPlacesPage from "./pages/TrashedPlacesPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import { useContext } from "react";
-// axios.defaults.baseURL = "http://127.0.0.1:4000";
-axios.defaults.baseURL = "https://booking-app-wiux.onrender.com";
+axios.defaults.baseURL = "http://127.0.0.1:4000";
+// axios.defaults.baseURL = "https://booking-app-wiux.onrender.com";
 axios.defaults.withCredentials = true;
 
 function App() {
-  const { api } = useContext(UserContext);
-  console.log(api);
+  // const { api } = useContext(UserContext);
+  // console.log(api);
   return (
     <UserContextProvider>
       <Routes>

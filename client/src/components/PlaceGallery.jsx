@@ -34,7 +34,7 @@ export default function PlaceGallery({ place }) {
                 <div key={index} className="w-2/3">
                   <img
                     className="w-full"
-                    src={`${api}/uploads/${photo}`}
+                    src={`http://localhost:4000/uploads/${photo}`}
                     alt=""
                   />
                 </div>
@@ -52,7 +52,7 @@ export default function PlaceGallery({ place }) {
             <div className="overflow-hidden">
               <img
                 className="aspect-square w-full object-cover hover:transform hover:scale-110 transition ease duration-500"
-                src={`${api}/uploads/${place.photos[0]}`}
+                src={`http://localhost:4000/uploads/${place.photos[0]}`}
                 alt=""
               />
             </div>
@@ -64,7 +64,7 @@ export default function PlaceGallery({ place }) {
               <div className="overflow-hidden">
                 <img
                   className="aspect-square object-cover hover:transform hover:scale-110 transition ease duration-500"
-                  src={`${api}/uploads/${place.photos[1]}`}
+                  src={`http://localhost:4000/uploads/${place.photos[1]}`}
                   alt=""
                 />
               </div>
@@ -73,7 +73,7 @@ export default function PlaceGallery({ place }) {
               <div className="overflow-hidden">
                 <img
                   className="aspect-square object-cover relative top-2 hover:transform hover:scale-110 transition ease duration-500"
-                  src={`${api}/uploads/${place.photos[2]}`}
+                  src={`http://localhost:4000/uploads/${place.photos[2]}`}
                   alt=""
                 />
               </div>

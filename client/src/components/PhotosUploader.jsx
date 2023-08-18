@@ -84,7 +84,7 @@ export default function PhotosUploader({ addedPhotos, onChange }) {
             <div className="h-32 flex relative" key={link}>
               <img
                 className="rounded-2xl w-full object-cover"
-                src={`${api}/uploads/` + link}
+                src={`http://localhost:4000/uploads/` + link}
               />
               <button
                 onClick={(e) => removePhoto(e, link)}

@@ -47,13 +47,14 @@ class SitesController {
     try {
       const { token } = req.cookies;
       jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-        const { id } = userData;
-        Promise.all([
-          await Place.find({ owner: id }),
-          await Place.countDocumentsDeleted({ owner: id }),
-        ]).then(([places, deleteCount]) => {
-          res.json({ places, deleteCount });
-        });
+        // const { id } = userData;
+        console.log(userData);
+        // Promise.all([
+        //   await Place.find({ owner: id }),
+        //   await Place.countDocumentsDeleted({ owner: id }),
+        // ]).then(([places, deleteCount]) => {
+        //   res.json({ places, deleteCount });
+        // });
       });
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });

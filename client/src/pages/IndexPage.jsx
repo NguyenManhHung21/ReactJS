@@ -9,7 +9,7 @@ export default function IndexPage() {
   const [booked, setBooked] = useState([]);
   const [indexPage, setIndexPage] = useState(1);
   const [totalPage, setTotalPage] = useState("");
-  const { ready, api } = useContext(UserContext);
+  const { ready } = useContext(UserContext);
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function IndexPage() {
                 {place.photos?.[0] && (
                   <img
                     className="rounded-2xl object-cover aspect-square hover:transform hover:scale-105 transition duration-300 ease-in"
-                    src={`${api}/uploads/` + place.photos?.[0]}
+                    src={`http://localhost:4000/uploads/` + place.photos?.[0]}
                     alt=""
                   />
                 )}

@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 const multer = require("multer");
 const fs = require("fs");
-// const db = require("./src/config/db");
+const db = require("./src/config/db");
 const route = require("./src/routes");
 
 //IRVtd7spPJzJSwig
@@ -25,18 +25,18 @@ app.use(
 );
 
 //Connect to DB
-// db.connect();
-const connect = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("connect succeefully");
-  } catch (error) {
-    console.log("error: ", error);
-  }
-};
+db.connect();
+// const connect = async () => {
+//   try {
+//     await mongoose.connect(process.env.MONGO_URL, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//     });
+//     console.log("connect succeefully");
+//   } catch (error) {
+//     console.log("error: ", error);
+//   }
+// };
 //Routes init
 route(app);
 
@@ -79,22 +79,23 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
   res.json(uploadFiles);
 });
 
-app.get(
-  "/middleware",
-  (req, res, next) => {
-    if (["vevip", "vethuong"].includes(req.query.ve)) {
-      req.weapon = "sword";
-      return next();
-    }
-    res.status(403).json({
-      message: "Go home and bring your tiket now!",
-    });
-  },
-  (req, res, next) => {
-    res.send(
-      `<h2 style="color: red;">Anh Hung dep trai dang cam ${req.weapon} </h2>`
-    );
-  }
-);
 
-app.listen(4000, () => connect());
+// app.get(
+//   "/middleware",
+//   (req, res, next) => {
+//     if (["vevip", "vethuong"].includes(req.query.ve)) {
+//       req.weapon = "sword";
+//       return next();
+//     }
+//     res.status(403).json({
+//       message: "Go home and bring your tiket now!",
+//     });
+//   },
+//   (req, res, next) => {
+//     res.send(
+//       `<h2 style="color: red;">Anh Hung dep trai dang cam ${req.weapon} </h2>`
+//     );
+//   }
+// );
+
+app.listen(4000, () => console.log('Server is runing on port 4000'));
