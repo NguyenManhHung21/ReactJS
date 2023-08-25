@@ -8,6 +8,7 @@ import PlaceGallery from "../components/PlaceGallery";
 export default function BookingPage() {
   const [booking, setBooking] = useState(null);
   const { id } = useParams();
+  console.log(id);
   useEffect(() => {
     if (id) {
       axios.get("bookings/by-account").then((res) => {
