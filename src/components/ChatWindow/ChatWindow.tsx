@@ -1,23 +1,13 @@
 import { SendOutlined, UserAddOutlined } from "@ant-design/icons";
 import { Alert, Avatar, Button, Form, Input, Tooltip } from "antd";
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useContext, useMemo, useState } from "react";
 import { styled } from "styled-components";
 import { IRooms } from "../SideBar/RoomList";
 import { AppContext } from "../../Context/AppProvider";
 import InviteMemberModal from "../Modals/InviteMemberModal";
 import { isEmpty } from "lodash";
 import { IConditionRef, IMessage, IUser } from "../../typeChatApp";
-import {
-  arrayUnion,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { AuthContext } from "../../Context/AuthProvider";
 import { useFirestore } from "../../hooks/useFirestore";
@@ -61,6 +51,7 @@ const ButtonGroup = styled.div`
 const MessageList = styled.div`
   max-height: 100%;
   overflow-y: auto;
+  padding: 0 25px;
 `;
 const MessageContent = styled.div`
   height: calc(100% - 90px);
@@ -84,7 +75,7 @@ const FormStyled = styled(Form)`
   }
 `;
 
-export const formatDate = (seconds: number| null) => {
+export const formatDate = (seconds: number | null) => {
   let formatedDate = "";
 
   if (seconds) {
@@ -179,7 +170,7 @@ export default function ChatWindow(props: IChatWindowProps) {
             </Button>
             <Avatar.Group size="small" maxCount={2}>
               {members.map((member) => (
-                <Tooltip title={"A"} key={member.id}>
+                <Tooltip title={member.displayName} key={member.id}>
                   <Avatar src={member.photoURL}>
                     {member.photoURL
                       ? ""
@@ -201,6 +192,7 @@ export default function ChatWindow(props: IChatWindowProps) {
         <MessageList>
           {messages.map((mes: IMessage, index: number) => (
             <Message
+              isUserLogined={mes.uid === uid}
               key={`${mes.roomId}-${index}`}
               text={mes.text}
               photoURL={mes.photoURL}
