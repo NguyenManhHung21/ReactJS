@@ -1,6 +1,4 @@
 import {
-  FieldPath,
-  WhereFilterOp,
   collection,
   onSnapshot,
   orderBy,
@@ -9,20 +7,18 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
+import { IConditionRef } from "../typeChatApp";
 
-export interface IConditionRef {
-  fieldName: string | FieldPath;
-  operator: WhereFilterOp;
-  compareValue: any;
-}
+
 
 // type DataType<T> = Array<T>;
 
+// generics typescript
 export const useFirestore = <T>(
   collectionName: string,
   condition?: IConditionRef
 ) => {
-  const [documents, setDocuments] = useState<Array<T>>();
+  const [documents, setDocuments] = useState<Array<T>>([]);
   useEffect(() => {
     if (condition) {
       if (!condition.compareValue || !condition.compareValue.length) {
@@ -41,6 +37,7 @@ export const useFirestore = <T>(
 
           setDocuments(data);
         });
+        
       });
     } else {
       const q = query(
@@ -56,6 +53,6 @@ export const useFirestore = <T>(
         });
       });
     }
-  }, [collection, condition]);
+  }, [collection, condition, collectionName]);
   return documents;
 };

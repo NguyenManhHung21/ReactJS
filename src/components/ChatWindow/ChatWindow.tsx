@@ -1,8 +1,29 @@
 import { SendOutlined, UserAddOutlined } from "@ant-design/icons";
-import { Avatar, Button, Form, Input, Tooltip } from "antd";
-import * as React from "react";
+import { Alert, Avatar, Button, Form, Input, Tooltip } from "antd";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { styled } from "styled-components";
+import { IRooms } from "../SideBar/RoomList";
+import { AppContext } from "../../Context/AppProvider";
+import InviteMemberModal from "../Modals/InviteMemberModal";
+import { isEmpty } from "lodash";
+import { IConditionRef, IMessage, IUser } from "../../typeChatApp";
+import {
+  arrayUnion,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { AuthContext } from "../../Context/AuthProvider";
+import { useFirestore } from "../../hooks/useFirestore";
 import Message from "./Message";
+import { addDocument } from "../../firebase/services";
+import { formatRelative } from "date-fns";
 
 export interface IChatWindowProps {}
 const WrapperContainer = styled.div`
@@ -42,7 +63,7 @@ const MessageList = styled.div`
   overflow-y: auto;
 `;
 const MessageContent = styled.div`
-  height: calc(100% - 56px);
+  height: calc(100% - 90px);
   display: flex;
   flex-direction: column;
   padding: 11px;
@@ -62,72 +83,148 @@ const FormStyled = styled(Form)`
     margin: 0;
   }
 `;
+
+export const formatDate = (seconds: number| null) => {
+  let formatedDate = "";
+
+  if (seconds) {
+    formatedDate = formatRelative(new Date(seconds * 1000), new Date());
+
+    formatedDate = formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
+  }
+  return formatedDate;
+};
 export default function ChatWindow(props: IChatWindowProps) {
+  const {
+    selectedRoom,
+    members,
+    newMenbers,
+    setNewMenbers,
+  }: {
+    selectedRoom: IRooms;
+    members: Array<IUser & { id: string }>;
+    newMenbers: Array<string>;
+    setNewMenbers: Dispatch<SetStateAction<Array<string>>>;
+  } = useContext<any>(AppContext);
+  const {
+    user: { uid, photoURL, displayName },
+  }: { user: IUser } = useContext<any>(AuthContext);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [form] = Form.useForm();
+  const [formInput] = Form.useForm();
+  const handleOk = async () => {
+    const membersRef = doc(db, "rooms", selectedRoom.id);
+    await updateDoc(membersRef, {
+      members: arrayUnion(...newMenbers),
+    });
+    setShowInviteModal(false);
+    setNewMenbers([]);
+  };
+  const handleCancel = () => {
+    setShowInviteModal(false);
+  };
+  const handleIpChange = (e: any) => {
+    setInputValue(e.target.value);
+  };
+  const handleOnSubmit = () => {
+    addDocument("messages", {
+      text: inputValue,
+      uid,
+      photoURL,
+      displayName,
+      roomId: selectedRoom.id,
+    });
+    formInput.resetFields(["message"]);
+  };
+
+  const conditionMes: IConditionRef = useMemo(
+    () => ({
+      fieldName: "roomId",
+      operator: "==",
+      compareValue: selectedRoom.id,
+    }),
+    [selectedRoom.id]
+  );
+
+  // lấy ra document messages có roomId là selectedRoom.id
+  const messages: Array<IMessage> = useFirestore<IMessage>(
+    "messages",
+    conditionMes
+  );
   return (
     <WrapperContainer>
-      <Header>
-        <div className="header__info">
-          <p className="header__title">Room 1</p>
-          <span className="header__description">Day la </span>
-        </div>
-        <ButtonGroup>
-          <Button type="text" icon={<UserAddOutlined />}>
-            Mời
-          </Button>
-          <Avatar.Group size="small" maxCount={2}>
-            <Tooltip title={"A"}>
-              <Avatar>A</Avatar>
-            </Tooltip>
-            <Tooltip title={"B"}>
-              <Avatar>B</Avatar>
-            </Tooltip>
-            <Tooltip title={"C"}>
-              <Avatar>C</Avatar>
-            </Tooltip>
-            <Tooltip title={"D"}>
-              <Avatar>D</Avatar>
-            </Tooltip>
-          </Avatar.Group>
-        </ButtonGroup>
-      </Header>
+      {isEmpty(selectedRoom) ? (
+        <Alert
+          message="Hãy chọn phòng"
+          type="info"
+          showIcon
+          style={{ margin: 5 }}
+        />
+      ) : (
+        <Header>
+          <div className="header__info">
+            <p className="header__title">{selectedRoom?.name}</p>
+            <span className="header__description">
+              {selectedRoom?.description}
+            </span>
+          </div>
+          <ButtonGroup>
+            <Button
+              onClick={() => setShowInviteModal(true)}
+              type="text"
+              icon={<UserAddOutlined />}
+            >
+              Mời
+            </Button>
+            <Avatar.Group size="small" maxCount={2}>
+              {members.map((member) => (
+                <Tooltip title={"A"} key={member.id}>
+                  <Avatar src={member.photoURL}>
+                    {member.photoURL
+                      ? ""
+                      : member.displayName?.charAt(0).toUpperCase()}
+                  </Avatar>
+                </Tooltip>
+              ))}
+            </Avatar.Group>
+          </ButtonGroup>
+        </Header>
+      )}
+      <InviteMemberModal
+        form={form}
+        showInviteModal={showInviteModal}
+        handleOk={handleOk}
+        handleCancel={handleCancel}
+      />
       <MessageContent>
         <MessageList>
-          <Message
-            text={"Test"}
-            photoURL={"photo"}
-            displayName={"Nguyen Manh Hung"}
-            createdAt={"27-03-2023"}
-          />
-          <Message
-            text={"Test"}
-            photoURL={"photo"}
-            displayName={"Nguyen Manh Hung"}
-            createdAt={"27-03-2023"}
-          />
-          <Message
-            text={"Test"}
-            photoURL={"photo"}
-            displayName={"Nguyen Manh Hung"}
-            createdAt={"27-03-2023"}
-          />
-          <Message
-            text={"Test"}
-            photoURL={"photo"}
-            displayName={"Nguyen Manh Hung"}
-            createdAt={"27-03-2023"}
-          />
-          <Message
-            text={"Test"}
-            photoURL={"photo"}
-            displayName={"Nguyen Manh Hung"}
-            createdAt={"27-03-2023"}
-          />
+          {messages.map((mes: IMessage, index: number) => (
+            <Message
+              key={`${mes.roomId}-${index}`}
+              text={mes.text}
+              photoURL={mes.photoURL}
+              displayName={mes.displayName}
+              createdAt={mes.createdAt}
+            />
+          ))}
         </MessageList>
-        <FormStyled>
-          <Form.Item>
-            <Input placeholder="Nhập tin nhắn" bordered={false}/>
+        <FormStyled form={formInput}>
+          <Form.Item name="message">
+            <Input
+              value={inputValue}
+              onChange={handleIpChange}
+              onPressEnter={handleOnSubmit}
+              placeholder="Nhập tin nhắn"
+              bordered={false}
+            />
           </Form.Item>
-          <Button size="large" icon={<SendOutlined />} type="primary"/>
+          <Button
+            onClick={handleOnSubmit}
+            size="large"
+            icon={<SendOutlined />}
+            type="primary"
+          />
         </FormStyled>
       </MessageContent>
     </WrapperContainer>

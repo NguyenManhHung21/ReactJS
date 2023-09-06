@@ -1,10 +1,11 @@
 import { Avatar, Button, Typography } from "antd";
-import { UserInfo, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { styled } from "styled-components";
 import { auth} from "../../firebase/config";
 import { useContext, useEffect } from "react";
-import { AuthContext,IUser } from "../../AuthProvider";
+import { AuthContext } from "../../Context/AuthProvider";
 import { useFirestore } from "../../hooks/useFirestore";
+import { IUser } from "../../typeChatApp";
 
 export interface IUserInforProps {}
 
@@ -39,11 +40,6 @@ export default function UserInfor(props: IUserInforProps) {
   // }, []);
   const userSnapshot = useFirestore<IUser>('users');
   const { user, setUser }: any= useContext(AuthContext);
-  useEffect(() => {
-    
-    console.log(userSnapshot);
-    
-  }, [])
   const handleLogOut = () => {
     signOut(auth);
     setUser({});

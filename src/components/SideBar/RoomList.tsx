@@ -1,21 +1,22 @@
 import { PlusSquareOutlined } from "@ant-design/icons";
-import { Button, Collapse, CollapseProps } from "antd";
+import { Button, Collapse, CollapseProps, Form } from "antd";
 import Link from "antd/es/typography/Link";
 import * as React from "react";
 import { styled } from "styled-components";
-import { AuthContext } from "../../AuthProvider";
-import { IConditionRef, useFirestore } from "../../hooks/useFirestore";
+import { AuthContext } from "../../Context/AuthProvider";
+import { AppContext } from "../../Context/AppProvider";
+import AddRoomModal from "../Modals/AddRoomModal";
+import { addDocument } from "../../firebase/services";
+import { IUser } from "../../typeChatApp";
 
-export interface IRoomListProps {
-  
-}
+export interface IRoomListProps {}
 
-interface IRooms {
-  member: Array<string>,
-  name: string,
-  createdAt: string,
-  description: string,
-  id: string
+export interface IRooms {
+  members: Array<string>;
+  name: string;
+  createdAt: string;
+  description: string;
+  id: string;
 }
 const CollapseStyled = styled(Collapse)`
   &&& {
@@ -41,30 +42,61 @@ const LinkContainer = styled.div`
 `;
 
 export default function RoomList(props: IRoomListProps) {
-  const { user }: any = React.useContext(AuthContext);
+  const [isShowModal, setIsShowModal] = React.useState(false);
+  const {
+    rooms,
+    setselectedRoomId,
+  }: {
+    rooms: Array<IRooms>;
+    setselectedRoomId: React.Dispatch<React.SetStateAction<string>>;
+  } = React.useContext<any>(AppContext);
+  const {
+    user,
+  }: {
+    user: IUser;
+  } = React.useContext<any>(AuthContext);
+  const [form] = Form.useForm();
 
-  const roomsCondition: IConditionRef = React.useMemo(() => {
-    return {
-      fieldName: "members",
-      operator: "array-contains",
-      compareValue: user.uid,
-    };
-  }, [user.uid]);
-  
-  const rooms = useFirestore<IRooms>("rooms", roomsCondition);
-  console.log({ rooms });
+  const handleOpenModal = () => {
+    setIsShowModal(true);
+  };
+
+  const handleOk = () => {
+    addDocument("rooms", { ...form.getFieldsValue(), members: [user.uid] });
+    form.resetFields();
+
+    setIsShowModal(false);
+  };
+  const handleCancel = () => {
+    setIsShowModal(false);
+  };
 
   const Rooms = () => (
     <LinkContainer>
-      {/* <Link href="">Room 1</Link>
-      <Link href="">Room 2</Link>
-      <Link href="">Room 3</Link> */}
-      {
-        rooms?.map(room => (<Link key={room.id} href="">{room?.name}</Link>))
-      }
-      <Button type="text" className="add-room" icon={<PlusSquareOutlined />}>
+      {rooms?.map((room) => (
+        <Link
+          key={room.id}
+          onClick={() => {
+            setselectedRoomId(room.id);
+          }}
+        >
+          {room.name}
+        </Link>
+      ))}
+      <Button
+        type="text"
+        className="add-room"
+        icon={<PlusSquareOutlined />}
+        onClick={handleOpenModal}
+      >
         Thêm phòng
       </Button>
+      <AddRoomModal
+        form={form}
+        isShowModal={isShowModal}
+        handleCancel={handleCancel}
+        handleOk={handleOk}
+      />
     </LinkContainer>
   );
   const items: CollapseProps["items"] = [
@@ -75,6 +107,8 @@ export default function RoomList(props: IRoomListProps) {
     },
   ];
   return (
-    <CollapseStyled ghost items={items} defaultActiveKey={["room-chat"]} />
+    <>
+      <CollapseStyled ghost items={items} defaultActiveKey={["room-chat"]} />
+    </>
   );
 }

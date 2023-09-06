@@ -3,7 +3,8 @@ import "./App.css";
 import Login from "./pages/Login";
 import NotFoundPage from "./pages/NotFoundPage";
 import ChatRoom from "./pages/ChatRoom";
-import AuthProvider from "./AuthProvider";
+import AuthProvider from "./Context/AuthProvider";
+import AppProvider from "./Context/AppProvider";
 
 function App() {
   const router = createBrowserRouter([
@@ -20,7 +21,9 @@ function App() {
   ]);
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <AppProvider>
+        <RouterProvider router={router} />
+      </AppProvider>
     </AuthProvider>
   );
 }

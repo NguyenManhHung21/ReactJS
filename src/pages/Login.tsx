@@ -2,38 +2,46 @@ import { Button, Col, Row } from "antd";
 import Title from "antd/es/typography/Title";
 import React, { useEffect } from "react";
 import { auth } from "../firebase/config";
-import { FacebookAuthProvider, getAdditionalUserInfo, signInWithPopup } from "firebase/auth";
-import { AuthContext } from "../AuthProvider";
+import {
+  FacebookAuthProvider,
+  getAdditionalUserInfo,
+  signInWithPopup,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { addDocument } from "../firebase/services";
+import { addDocument, generateKeywords } from "../firebase/services";
+import { AuthContext } from "../Context/AuthProvider";
+import { isEmpty } from "lodash";
+import { IUser } from "../typeChatApp";
 
 export interface ILoginProps {}
 
 export default function Login(props: ILoginProps) {
   const navigate = useNavigate();
-  const { user }: any = React.useContext(AuthContext);
-  console.log(user);
-  
+  const { user }: { user: IUser } = React.useContext<any>(AuthContext);
   useEffect(() => {
-    if (user.email) navigate("/");
+    if (!isEmpty(user)) navigate("/");
   }, [user, navigate]);
 
   const provider = new FacebookAuthProvider();
   const handleFbLogin = () => {
     // getAdditionalUserInfo()
     signInWithPopup(auth, provider).then((results) => {
-      if(getAdditionalUserInfo(results)?.isNewUser) {
+      if (getAdditionalUserInfo(results)?.isNewUser) {
         // ghi dữ liệu vào trong firestore db
-        addDocument('users', results.user.email as string, {
-          displayName: results.user.displayName,
-          email: results.user.email,
-          photoURL: results.user.photoURL,
-          uid: results.user.uid,
-          providerId: results.providerId
-        })
+        addDocument(
+          "users",
+          {
+            displayName: results.user.displayName,
+            email: results.user.email,
+            photoURL: results.user.photoURL,
+            uid: results.user.uid,
+            providerId: results.providerId,
+            keywords: generateKeywords(results.user.displayName),
+          },
+          results.user.email as string
+        );
       }
-      
-    })
+    });
   };
 
   return (
